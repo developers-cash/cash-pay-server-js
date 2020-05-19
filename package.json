@@ -1,0 +1,36 @@
+{
+  "name": "cash-pay-microservice-js",
+  "version": "0.0.12",
+  "description": "A Client-side and Server-side library for integrating with Cash Pay Microservice instances.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx webpack"
+  },
+  "keywords": [
+    "bip70",
+    "payment protocol",
+    "bitcoin",
+    "bch"
+  ],
+  "author": "Jimtendo (jimtendo@protonmail.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "babel-loader": "^8.1.0",
+    "browserify": "^16.5.0",
+    "css-loader": "^3.5.3",
+    "style-loader": "^1.2.1",
+    "uglify-js": "^3.8.1",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "lodash": "^4.17.15",
+    "qrcode": "^1.4.4",
+    "socket.io": "^2.3.0"
+  }
+}
