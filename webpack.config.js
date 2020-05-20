@@ -6,7 +6,7 @@ module.exports = {
         entry: __dirname + '/src/index.js'
     },
     output: {
-        filename: 'cashpay.bundle.js',
+        filename: 'cashpay.min.js',
         library: 'CashPay',
     },
     module: {

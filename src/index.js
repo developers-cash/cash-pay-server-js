@@ -53,14 +53,14 @@ export class Invoice {
         requested: [],
         broadcasted: [],
         error: [],
-      },
-      webhooks: {}
+      }
     }, options);
 
     this._invoice = {
       params: Object.assign({}, {
           network: 'main',
           outputs: [],
+          webhooks: {}
       }, params),
     };
   }
@@ -283,7 +283,6 @@ export class Invoice {
   _setupContainer(container) {
     let img = document.createElement('img');
     img.style.width = '100%';
-    img.style.height = '100%';
     img.src = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNjQwIj4KICA8Y2lyY2xlIGN4PSIzMjAiIGN5PSIzMjAiIHI9IjMyMCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjMyMCIgY3k9IjMyMCIgcj0iMjc4IiBmaWxsPSIjMDBjNThhIi8+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTI5Ni43IDQ0MS4yTDIzNiA0NTZsLTEtMzkgMTEuNC0zYzEzLjYtMy40IDE2LjgtMy44IDE2LjgtOSAwLTIuMy03LjgtMzUuNS0xNy42LTcyLjUtMjEuMi04MS42LTE5LTc3LjgtNDUuNC03MC42bC0xNCAzLjctOC0zMi40IDYxLjEtMTUuMi0xMy00OC4yIDMwLjctNy41IDEyLjggNDcuOSAyMS42LTUuNS0xMi00OC42IDMwLjctNy43IDEyLjcgNDkuMmMzNC4yLTEwLjkgNjguMyAwIDgyLjggMjguNiA4LjcgMjQuOSA4IDM2LjYtMTAgNjAuMyAxOC43IDUuMSA1NC42IDE0LjggNTYuNyA1OCAyLjEgNDMuMi0zOC40IDY4LjUtNzIgNzUuMmwxMiA0OC42LTMwLjMgOC0xMi00OC42LTIyIDUuNiAxMS40IDQ4LjYtMzAuMSA3LjZ6bTk3LTk4LjljLTguMy0zNi4yLTkxLjMtOS05MS4zLTlsMTUuNyA2My4zczg1LjgtMTAuMSA3NS42LTU0LjN6bS0zMi4yLTg3LjdjLTkuMi0zNy04Mi4zLTEwLTgyLjMtMTBsMTUuMyA1OHM3Ny41LTUuNSA2Ny00OHoiLz4KPC9zdmc+Cg==`;
     container.appendChild(img);
     
