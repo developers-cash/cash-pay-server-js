@@ -42,7 +42,7 @@ import './cashpay.css'
   * console.log(invoice.getWalletURI);
   */
 export class Invoice {
-  constructor(params, options) {
+  constructor(options, params) {
     this._options = Object.assign({}, {
       endpoint: 'https://pay.infra.cash',
       listen: true,
@@ -54,6 +54,7 @@ export class Invoice {
         broadcasted: [],
         error: [],
       },
+      webhooks: {}
     }, options);
 
     this._invoice = {
@@ -172,6 +173,18 @@ export class Invoice {
   }
   
   /**
+   * Set Merchant Data
+   * @param data Merchant Data
+   * @example
+   * let invoice = new Invoice();
+   * invoice.setData("Example payment");
+   */
+  setData(data) {
+    this._invoice.params.data = data;
+    return this;
+  }
+  
+  /**
    * Set Webhook
    * @param event The type of Webhook (requested, broadcasted, etc)
    * @param endpoint The endpoint that should be hit
@@ -180,7 +193,7 @@ export class Invoice {
    * invoice.setWebhook("broadcasted", ');
    */
   setWebhook(event, endpoint) {
-    this._invoice.params[`${event}Webhook`] = endpoint;
+    this._invoice.params.webhooks[event] = endpoint;
     return this;
   }
   
