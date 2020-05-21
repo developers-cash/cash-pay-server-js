@@ -3,7 +3,10 @@ import axios from 'axios';
 import SocketIO from 'socket.io-client';
 import QRCode from 'qrcode';
 
-import './cashpay.css'
+import template from './template.html';
+import tick from './tick.svg';
+import cross from './cross.svg';
+import './cashpay.css';
 
 /**
   * Payment Invoice
@@ -53,6 +56,7 @@ export class Invoice {
         requested: [],
         broadcasted: [],
         error: [],
+        expires: [],
       }
     }, options);
 
@@ -63,6 +67,9 @@ export class Invoice {
           webhooks: {}
       }, params),
     };
+    
+    // These are computed variables
+    this._instance = {};
   }
 
   /**
@@ -106,9 +113,9 @@ export class Invoice {
    * and then sets up the Websocket listener so that the invoice is updated
    * in real-time.
    */
-  async create(container) {
+  async create(container, options) {
     if (container) {
-      this._setupContainer(container);
+      this._setupContainer(container, Object.assign({ margin: 0 }, options));
     }
     
     let invoiceRes = await axios.post(this._options.endpoint+'/invoice/create', this._invoice.params);
@@ -116,46 +123,28 @@ export class Invoice {
     this._service = invoiceRes.data.service;
     this._invoice = invoiceRes.data.invoice;
     
+    // Setup expiry timer
+    this._instance.expiryTimer = setInterval(() => {
+      let expires = new Date(this._invoice.params.expires*1000).getTime();
+      let now = new Date().getTime();
+      let secondsRemaining = Math.round((expires - now) / 1000);
+      this._options.on.expires.forEach(cb => cb(secondsRemaining));
+    }, 1000);
+    
+    // If it has expired, stop listener and clear interva;
+    this.on('expires', (secondsRemaining) => {
+      if (!secondsRemaining) {
+        
+      }
+    });
+    
     if (this._options.listen) {
-      await this.listen();
+      await this._listen();
     }
     
     this._options.on.created.forEach(cb => cb());
-
-    return this;
-  }
-
-  /**
-   * Setup WebSocket listener.
-   * This should not need to be called manually
-   */
-  async listen() {
-    var socket = SocketIO(this._service.webSocketURI);
     
-    socket.on('connect', () => {
-      socket.emit('subscribe', {
-        invoiceId: this._invoice.id
-      });
-    });
     
-    socket.on('subscribed', (msg) => {
-      this._options.on.subscribed.forEach(cb => cb(msg));
-    });
-    
-    socket.on('requested', (msg) => {
-      this._invoice = msg.invoice;
-      this._options.on.requested.forEach(cb => cb(msg));
-    });
-    
-    socket.on('broadcasted', (msg) => {
-      this._invoice = msg.invoice;
-      this._options.on.broadcasted.forEach(cb => cb(msg));
-    });
-    
-    socket.on('error', (msg) => {
-      this._invoice = msg.invoice;
-      this._options.on.error.forEach(cb => cb(msg));
-    });
 
     return this;
   }
@@ -185,6 +174,30 @@ export class Invoice {
   }
   
   /**
+   * The unit of fiat (e.g. USD) that will be displayed to the user
+   * @param seconds Seconds from time of creation that Payment Request expires
+   * @example
+   * let invoice = new Invoice();
+   * invoice.setExpiration(15 * 60); // 15 Minutes
+   */
+  setUserCurrency(currency) {
+    this._invoice.params.userCurrency = currency;
+    return this;
+  }
+  
+  /**
+   * Set expiration time
+   * @param seconds Seconds from time of creation that Payment Request expires
+   * @example
+   * let invoice = new Invoice();
+   * invoice.setExpiration(15 * 60); // 15 Minutes
+   */
+  setExpires(seconds) {
+    this._invoice.params.expires = seconds;
+    return this;
+  }
+  
+  /**
    * Set Webhook
    * @param event The type of Webhook (requested, broadcasted, etc)
    * @param endpoint The endpoint that should be hit
@@ -203,10 +216,10 @@ export class Invoice {
    * @param amount Amount in satoshis
    * @example
    * let invoice = new Invoice();
-   * invoice.addAddress(
-   *   "bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg",
-   *   100000
-   * );
+   * invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", 100000);
+   * 
+   * // Or specify a currency code for on-the-fly conversion
+   * invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.50USD");
    */
   addAddress(address, amount) {
     this._invoice.params.outputs.push({
@@ -251,14 +264,8 @@ export class Invoice {
     return _.get(this, '_service.walletURI', '');
   }
   
-  /**
-   * Returns the QR Code URI (for easier embedding on client-side).
-   * @example
-   * invoice.getQrCodeURI()
-   * // https://pay.bip70.cash/invoice/qrcode/5e5a332c356cbd08f218521a
-   */
-  getQRCodeURI() {
-    return _.get(this, '_service.qrCodeURI', '');
+  getTotalAmount() {
+    return this._invoice.params.outputs.reduce((total, output) => total + output.amount, 0);
   }
 
   /**
@@ -278,31 +285,100 @@ export class Invoice {
   }
   
   /**
+   * Setup WebSocket listener.
+   * This should not need to be called manually
+   */
+  async _listen() {
+    this._instance.socket = SocketIO(this._service.webSocketURI);
+    
+    this._instance.socket.on('connect', () => {
+      this._instance.socket.emit('subscribe', {
+        invoiceId: this._invoice.id
+      });
+    });
+    
+    this._instance.socket.on('subscribed', (msg) => {
+      this._options.on.subscribed.forEach(cb => cb(msg));
+    });
+    
+    this._instance.socket.on('requested', (msg) => {
+      this._invoice = msg.invoice;
+      this._options.on.requested.forEach(cb => cb(msg));
+    });
+    
+    this._instance.socket.on('broadcasted', (msg) => {
+      this._invoice = msg.invoice;
+      this._options.on.broadcasted.forEach(cb => cb(msg));
+    });
+    
+    this._instance.socket.on('error', (msg) => {
+      this._invoice = msg.invoice;
+      this._options.on.error.forEach(cb => cb(msg));
+    });
+
+    return this;
+  }
+  
+  /**
    * TODO Sort this shit out
    */
-  _setupContainer(container) {
-    let img = document.createElement('img');
-    img.style.width = '100%';
-    img.src = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNjQwIj4KICA8Y2lyY2xlIGN4PSIzMjAiIGN5PSIzMjAiIHI9IjMyMCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjMyMCIgY3k9IjMyMCIgcj0iMjc4IiBmaWxsPSIjMDBjNThhIi8+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTI5Ni43IDQ0MS4yTDIzNiA0NTZsLTEtMzkgMTEuNC0zYzEzLjYtMy40IDE2LjgtMy44IDE2LjgtOSAwLTIuMy03LjgtMzUuNS0xNy42LTcyLjUtMjEuMi04MS42LTE5LTc3LjgtNDUuNC03MC42bC0xNCAzLjctOC0zMi40IDYxLjEtMTUuMi0xMy00OC4yIDMwLjctNy41IDEyLjggNDcuOSAyMS42LTUuNS0xMi00OC42IDMwLjctNy43IDEyLjcgNDkuMmMzNC4yLTEwLjkgNjguMyAwIDgyLjggMjguNiA4LjcgMjQuOSA4IDM2LjYtMTAgNjAuMyAxOC43IDUuMSA1NC42IDE0LjggNTYuNyA1OCAyLjEgNDMuMi0zOC40IDY4LjUtNzIgNzUuMmwxMiA0OC42LTMwLjMgOC0xMi00OC42LTIyIDUuNiAxMS40IDQ4LjYtMzAuMSA3LjZ6bTk3LTk4LjljLTguMy0zNi4yLTkxLjMtOS05MS4zLTlsMTUuNyA2My4zczg1LjgtMTAuMSA3NS42LTU0LjN6bS0zMi4yLTg3LjdjLTkuMi0zNy04Mi4zLTEwLTgyLjMtMTBsMTUuMyA1OHM3Ny41LTUuNSA2Ny00OHoiLz4KPC9zdmc+Cg==`;
-    container.appendChild(img);
+  _setupContainer(container, options) {
+    options = Object.assign({
+      color: '#14244c',
+      scale: 12,
+      margin: 0
+    }, options);
     
-    let p = document.createElement('p');
-    p.className = "cashpay-invoice-status";
-    p.innerHTML = 'Creating invoice...';
-    container.appendChild(p);
+    container.innerHTML = template;
+    
+    let qrCodeEl = container.querySelector('.cashpay-qr-code');
+    let totalEl = container.querySelector('.cashpay-total');
+    let totalFiatEl = container.querySelector('.cashpay-total-fiat');
+    let expiresEl = container.querySelector('.cashpay-expires');
+    let buttonEl = container.querySelector('.cashpay-button');
+    let errorEl = container.querySelector('.cashpay-error');
+    
+    console.log(options.color);
     
     this.on('created', async () => {
-      img.src = await QRCode.toDataURL(this.getWalletURI());
-      p.innerHTML = 'Awaiting payment...';
+      qrCodeEl.src = await QRCode.toDataURL(this.getWalletURI(), {
+        color: {
+          dark: options.color
+        },
+        scale: options.scale,
+        margin: options.margin
+      });
+      totalEl.innerHTML = `${this.getTotalAmount()/100000000}BCH`;
+      totalFiatEl.innerHTML = `${this._invoice.meta.userCurrencyTotal}${this._invoice.params.userCurrency}`;
+      buttonEl.href = this.getWalletURI();
+      buttonEl.innerHTML = 'Open in Wallet';
+    });
+    
+    this.on('expires', (secondsRemaining) => {
+      if (secondsRemaining) {
+        let minutes = Math.floor(secondsRemaining / 60);
+        let seconds = secondsRemaining % 60;
+        expiresEl.innerHTML = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      } else {
+        clearInterval(this._instance.expiryTimer);
+        qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`;
+        buttonEl.removeAttribute('href');
+        buttonEl.innerHTML = 'Expired';
+        expiresEl.innerHTML = 'Invoice has Expired';
+      }
     });
     
     this.on('broadcasted', () => {
-      img.src = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzNjcuODA1IDM2Ny44MDUiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDM2Ny44MDUgMzY3LjgwNTsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzQkI1NEE7IiBkPSJNMTgzLjkwMywwLjAwMWMxMDEuNTY2LDAsMTgzLjkwMiw4Mi4zMzYsMTgzLjkwMiwxODMuOTAycy04Mi4zMzYsMTgzLjkwMi0xODMuOTAyLDE4My45MDIKCQlTMC4wMDEsMjg1LjQ2OSwwLjAwMSwxODMuOTAzbDAsMEMtMC4yODgsODIuNjI1LDgxLjU3OSwwLjI5LDE4Mi44NTYsMC4wMDFDMTgzLjIwNSwwLDE4My41NTQsMCwxODMuOTAzLDAuMDAxeiIvPgoJPHBvbHlnb24gc3R5bGU9ImZpbGw6I0Q0RTFGNDsiIHBvaW50cz0iMjg1Ljc4LDEzMy4yMjUgMTU1LjE2OCwyNjMuODM3IDgyLjAyNSwxOTEuMjE3IDExMS44MDUsMTYxLjk2IDE1NS4xNjgsMjA0LjgwMSAKCQkyNTYuMDAxLDEwMy45NjggCSIvPgo8L2c+Cjwvc3ZnPg==';
-      p.innerHTML = 'Payment received!';
+      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`;
+      buttonEl.removeAttribute('href');
+      buttonEl.innerHTML = 'Payment Received';
+      clearInterval(this._instance.expiryTimer);
+      expiresEl.innerHTML = '';
     });
     
-    this.on('error', () => {
-      p.innerHTML = 'An error occurred';
+    this.on('error', (err) => {
+      console.log(err);
+      errorEl.innerHTML = 'An error occurred';
     });
   }
 }
