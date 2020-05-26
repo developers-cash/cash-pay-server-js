@@ -1,11 +1,23 @@
 {
-  "name": "cash-pay-microservice-js",
-  "version": "0.0.12",
+  "name": "cash-pay-server-js",
+  "version": "0.3.0",
   "description": "A Client-side and Server-side library for integrating with Cash Pay Microservice instances.",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib/**/*",
+    "dist/**/*"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx webpack"
+    "build": "webpack --config ./webpack.browser.js && npx webpack --config ./webpack.node.js",
+    "build-dev": "webpack --config ./webpack.browser.js --mode development && npx webpack --config ./webpack.node.js --mode development",
+    "lint": "eslint src",
+    "format": "eslint src --fix",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "bip70",
@@ -20,16 +32,21 @@
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "babel-loader": "^8.1.0",
-    "browserify": "^16.5.0",
     "css-loader": "^3.5.3",
+    "eslint": "^7.1.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "html-loader": "^1.1.0",
     "style-loader": "^1.2.1",
     "svg-inline-loader": "^0.8.2",
-    "uglify-js": "^3.8.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@developers.cash/libcash-js": "^0.9.5",
     "axios": "^0.19.2",
     "lodash": "^4.17.15",
     "qrcode": "^1.4.4",
