@@ -242,7 +242,7 @@ class Invoice {
 
     return this
   }
-  
+
   /**
    * Make this invoice a static invoice
    * @param quantity Number of re-uses allowed
@@ -387,7 +387,7 @@ class Invoice {
         buttonEl.innerHTML = 'Payment Received'
         setTimeout(() => {
           buttonEl.innerHTML = 'Open in Wallet'
-        }, 5000);
+        }, 5000)
       }
     })
 
