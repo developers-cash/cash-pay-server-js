@@ -54,8 +54,9 @@ class Invoice {
         subscribed: [],
         requested: [],
         broadcasted: [],
-        error: [],
-        expires: []
+        expired: [],
+        timer: [],
+        error: []
       }
     }, options)
 
@@ -122,24 +123,18 @@ class Invoice {
     this._service = invoiceRes.data.service
     this._invoice = invoiceRes.data.invoice
 
-    // Setup expiry timer
-    if (!this._invoice.params.static) {
-      this._instance.expiryTimer = setInterval(() => {
-        const expires = new Date(this._invoice.state.expires * 1000).getTime()
-        const now = new Date().getTime()
-        const secondsRemaining = Math.round((expires - now) / 1000)
-        this._options.on.expires.forEach(cb => cb(secondsRemaining))
-      }, 1000)
-    }
-
-    // If it has expired, stop listener and clear interva;
-    this.on('expires', (secondsRemaining) => {
-      if (!secondsRemaining) {
-
-      }
-    })
-
     if (this._options.listen) {
+      // Setup expiration timer
+      if (!this._invoice.params.static) {
+        this._setupExpirationTimer()
+      }
+
+      // If it has broadcasted or expired, disconnect socket and clear timer
+      this.on(['expired', 'broadcasted'], (secondsRemaining) => {
+        clearInterval(this._instance.expiryTimer)
+        this._instance.socket.disconnect(true)
+      })
+
       await this._listen()
     }
 
@@ -256,11 +251,16 @@ class Invoice {
 
   /**
    * Add an event handler.
-   * @param event Event to handle
+   * @param events Event to handle (or array of events)
    * @param callback Callback function
    */
-  on (event, callback) {
-    this._options.on[event].push(callback)
+  on (events, callback) {
+    if (typeof events === 'string') {
+      events = [events]
+    }
+
+    events.forEach(event => this._options.on[event].push(callback))
+
     return this
   }
 
@@ -330,25 +330,54 @@ class Invoice {
   }
 
   /**
+   * Setup expiration timer
+   */
+  _setupExpirationTimer () {
+    this._instance.expiryTimer = setInterval(() => {
+      const expires = new Date(this._invoice.state.expires * 1000).getTime()
+      const now = new Date().getTime()
+      const secondsRemaining = Math.round((expires - now) / 1000)
+
+      if (secondsRemaining) {
+        this._options.on.timer.forEach(cb => cb(secondsRemaining))
+      } else {
+        this._options.on.expired.forEach(cb => cb())
+      }
+    }, 1000)
+  }
+
+  /**
    * TODO Sort this shit out
    */
   _setupContainer (container, options) {
     options = Object.assign({
       color: '#14244c',
       scale: 12,
-      margin: 0
+      margin: 0,
+      template: template,
+      lang: {
+        openInWallet: 'Open in Wallet',
+        expiresIn: 'Expires in ',
+        invoiceHasExpired: 'Invoice has expired',
+        expired: 'Expired',
+        paymentReceived: 'Payment received'
+      }
     }, options)
 
-    container.innerHTML = template
+    // Inject template
+    container.innerHTML = options.template
 
+    // Find container elements
     const qrCodeEl = container.querySelector('.cashpay-qr-code')
-    const totalEl = container.querySelector('.cashpay-total')
+    const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
     const buttonEl = container.querySelector('.cashpay-button')
     const errorEl = container.querySelector('.cashpay-error')
 
+    // Trigger on invoice creation...
     this.on('created', async () => {
+      // Render QR Code
       qrCodeEl.src = await QRCode.toDataURL(this.getWalletURI(), {
         color: {
           dark: options.color
@@ -356,41 +385,52 @@ class Invoice {
         scale: options.scale,
         margin: options.margin
       })
-      totalEl.innerHTML = `${this.getTotalAmount() / 100000000}BCH`
+
+      // Set totals for BCH and Fiat
       totalFiatEl.innerHTML = `${this._invoice.state.totals.userCurrency}${this._invoice.params.userCurrency}`
-      buttonEl.href = this.getWalletURI()
-      buttonEl.innerHTML = 'Open in Wallet'
-    })
 
-    this.on('expires', (secondsRemaining) => {
-      if (secondsRemaining) {
-        const minutes = Math.floor(secondsRemaining / 60)
-        const seconds = secondsRemaining % 60
-        expiresEl.innerHTML = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
-      } else {
-        clearInterval(this._instance.expiryTimer)
-        qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`
-        buttonEl.removeAttribute('href')
-        buttonEl.innerHTML = 'Expired'
-        expiresEl.innerHTML = 'Invoice has Expired'
-      }
-    })
-
-    this.on('broadcasted', () => {
+      // Only show in BCH if this is not a static invoice
       if (!this._invoice.params.static) {
+        totalBCHEl.innerHTML = `${this.getTotalAmount() / 100000000}BCH`
+      }
+
+      // Set the button text and url
+      buttonEl.innerHTML = options.lang.openInWallet
+      buttonEl.href = this.getWalletURI()
+    })
+
+    // Trigger on invoice broadcasted...
+    this.on('broadcasted', () => {
+      buttonEl.innerHTML = options.lang.paymentReceived
+
+      // If this is a static invoice
+      if (this._invoice.params.static) {
+        setTimeout(() => {
+          buttonEl.innerHTML = options.lang.openInWallet
+        }, 5000)
+      } else { // Otherwise...
         qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
         buttonEl.removeAttribute('href')
-        buttonEl.innerHTML = 'Payment Received'
-        clearInterval(this._instance.expiryTimer)
         expiresEl.innerHTML = ''
-      } else {
-        buttonEl.innerHTML = 'Payment Received'
-        setTimeout(() => {
-          buttonEl.innerHTML = 'Open in Wallet'
-        }, 5000)
       }
     })
 
+    // Trigger on invoice expiry
+    this.on('expired', () => {
+      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`
+      buttonEl.removeAttribute('href')
+      buttonEl.innerHTML = options.lang.expired
+      expiresEl.innerHTML = options.lang.invoiceHasExpired
+    })
+
+    // Trigger each time expiration timer updates
+    this.on('timer', (secondsRemaining) => {
+      const minutes = Math.floor(secondsRemaining / 60)
+      const seconds = secondsRemaining % 60
+      expiresEl.innerHTML = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
+    })
+
+    // Trigger on error
     this.on('error', (err) => {
       console.log(err)
       errorEl.innerHTML = 'An error occurred'

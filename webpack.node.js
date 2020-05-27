@@ -46,7 +46,6 @@ module.exports = {
       ]
     },
     externals: [
-      'axios',
-      'libcash-js',
+      /^\w+/
     ]
 }
