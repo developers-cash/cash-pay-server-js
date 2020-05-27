@@ -23,12 +23,10 @@ module.exports = {
                 modules: "commonjs",
                 targets: {
                   node: "10"
-                }
+                },
+                debug: true
               }]
             ],
-            plugins: [
-              '@babel/transform-runtime'
-            ]
           }
         },
         {
@@ -46,6 +44,7 @@ module.exports = {
       ]
     },
     externals: [
-      /^\w+/
+      /^\w+/,
+      /^\@\w+/
     ]
 }

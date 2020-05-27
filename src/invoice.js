@@ -47,7 +47,7 @@ class Invoice {
   constructor (options, params) {
     this._options = Object.assign({}, {
       endpoint: 'https://pay.infra.cash',
-      listen: true,
+      listen: typeof window !== 'undefined',
       on: {
         created: [],
         connected: [],
