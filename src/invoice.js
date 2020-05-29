@@ -56,7 +56,7 @@ class Invoice {
         broadcasted: [],
         expired: [],
         timer: [],
-        error: []
+        failed: []
       }
     }, options)
 
@@ -94,17 +94,27 @@ class Invoice {
    * let invoice = Invoice.fromExisting(payload);
    * // Websocket events will trigger client-side for above invoice
    */
-  static async fromExisting (payload, options) {
+  static fromExisting (existingInvoice, options) {
     const invoice = new Invoice()
-    invoice._options = Object.assign(payload.options, { listen: true }, options)
-    invoice._invoice = payload.invoice
-    invoice._service = payload.service
-
-    if (invoice._options.listen) {
-      await invoice.listen()
-    }
+    invoice._invoice = Object.assign(invoice._invoice, existingInvoice)
+    invoice._options = Object.assign(invoice._options, options)
 
     return invoice
+  }
+
+  /**
+   * Convenience function to create an invoice from the data returned from
+   * the given endpoint.
+   * @example
+   * let invoice = CashPay.Invoice.fromServerEndpoint('/create-invoice', {
+   *   invoiceId: "xxxx"
+   * });
+   *
+   * await invoice.create(document.getElementById('invoice-container'))
+   */
+  static async fromServerEndpoint (endpoint, params, options) {
+    const res = await axios.post(endpoint, params, options)
+    return this.fromExisting(res.data)
   }
 
   /**
@@ -118,29 +128,51 @@ class Invoice {
       this._setupContainer(container, Object.assign({ margin: 0 }, options))
     }
 
-    const invoiceRes = await axios.post(this._options.endpoint + '/invoice/create', this._invoice.params)
+    try {
+      if (!this._invoice.id) {
+        const invoiceRes = await axios.post(this._options.endpoint + '/invoice/create', this._invoice.params)
 
-    this._service = invoiceRes.data.service
-    this._invoice = invoiceRes.data.invoice
-
-    if (this._options.listen) {
-      // Setup expiration timer
-      if (!this._invoice.params.static) {
-        this._setupExpirationTimer()
+        this._invoice.service = invoiceRes.data.service
+        this._invoice = invoiceRes.data.invoice
       }
 
-      // If it has broadcasted or expired, disconnect socket and clear timer
-      this.on(['expired', 'broadcasted'], (secondsRemaining) => {
-        clearInterval(this._instance.expiryTimer)
-        this._instance.socket.disconnect(true)
-      })
+      if (this._options.listen) {
+        // Setup expiration timer
+        if (!this._invoice.params.static) {
+          this._setupExpirationTimer()
+        }
 
-      await this._listen()
+        // If it has broadcasted or expired, disconnect socket and clear timer
+        this.on(['expired', 'broadcasted'], (secondsRemaining) => {
+          clearInterval(this._instance.expiryTimer)
+          this._instance.socket.disconnect(true)
+        })
+
+        await this._listen()
+      }
+
+      this._options.on.created.forEach(cb => cb())
+
+      return this
+    } catch (err) {
+      this._options.on.failed.forEach(cb => cb(err))
+      console.error(err)
+      throw err
     }
+  }
 
-    this._options.on.created.forEach(cb => cb())
+  /**
+   * Get the invoiceID
+   */
+  getId () {
+    return this._invoice.id
+  }
 
-    return this
+  /**
+   * Get the raw invoice object
+   */
+  getRawInvoice (omit) {
+    return _.omit(this._invoice)
   }
 
   /**
@@ -156,6 +188,13 @@ class Invoice {
   }
 
   /**
+   * Get memo
+   */
+  getMemo () {
+    return this._invoice.params.memo
+  }
+
+  /**
    * Set Merchant Data
    * @param data Merchant Data
    * @example
@@ -165,6 +204,13 @@ class Invoice {
   setData (data) {
     this._invoice.params.data = data
     return this
+  }
+
+  /**
+   * Get merchant data
+   */
+  getData () {
+    return this._invoice.params.data
   }
 
   /**
@@ -180,6 +226,13 @@ class Invoice {
   }
 
   /**
+   * Get user currency
+   */
+  getUserCurrency () {
+    return this._invoice_params.userCurrency
+  }
+
+  /**
    * Set expiration time
    * @param seconds Seconds from time of creation that Payment Request expires
    * @example
@@ -192,15 +245,27 @@ class Invoice {
   }
 
   /**
+   * Get epxiration time
+   */
+  getExpires () {
+    return this._invoice.params.expires
+  }
+
+  /**
    * Set Webhook
-   * @param event The type of Webhook (requested, broadcasted, etc)
+   * @param events The type of Webhook (requested, broadcasted, etc)
    * @param endpoint The endpoint that should be hit
    * @example
    * let invoice = new Invoice();
    * invoice.setWebhook("broadcasted", ');
    */
-  setWebhook (event, endpoint) {
-    this._invoice.params.webhooks[event] = endpoint
+  setWebhook (events, endpoint) {
+    if (typeof events === 'string') {
+      events = [events]
+    }
+
+    events.forEach(event => { this._invoice.params.webhooks[event] = endpoint })
+
     return this
   }
 
@@ -239,6 +304,21 @@ class Invoice {
   }
 
   /**
+   * Check if invoice contains a particular output
+   * @param address The address to look for
+   * @param amount The amount it must equal
+   */
+  hasOutput (address, amount) {
+    const output = this._invoice.params.outputs.find(output => output.address === address)
+
+    if (!output) {
+      return false
+    }
+
+    return output.amount === amount
+  }
+
+  /**
    * Make this invoice a static invoice
    * @param quantity Number of re-uses allowed
    * @param expires How long this static invoice can be used for
@@ -271,7 +351,7 @@ class Invoice {
    * // bitcoincash:?r=https://pay.bip70.cash/invoice/pay/5e5a332c356cbd08f218521a
    */
   getWalletURI () {
-    return _.get(this, '_service.walletURI', '')
+    return _.get(this, '_invoice.service.walletURI', '')
   }
 
   getTotalAmount () {
@@ -299,7 +379,7 @@ class Invoice {
    * This should not need to be called manually
    */
   async _listen () {
-    this._instance.socket = SocketIO(this._service.webSocketURI)
+    this._instance.socket = SocketIO(this._invoice.service.webSocketURI)
 
     this._instance.socket.on('connect', () => {
       this._instance.socket.emit('subscribe', {
@@ -321,9 +401,8 @@ class Invoice {
       this._options.on.broadcasted.forEach(cb => cb(msg))
     })
 
-    this._instance.socket.on('error', (msg) => {
-      this._invoice = msg.invoice
-      this._options.on.error.forEach(cb => cb(msg))
+    this._instance.socket.on('failed', (msg) => {
+      this._options.on.failed.forEach(cb => cb(msg))
     })
 
     return this
@@ -368,6 +447,7 @@ class Invoice {
     container.innerHTML = options.template
 
     // Find container elements
+    const subContainerEl = container.querySelector('.cashpay-container')
     const qrCodeEl = container.querySelector('.cashpay-qr-code')
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
@@ -387,53 +467,60 @@ class Invoice {
       })
 
       // Set totals for BCH and Fiat
-      totalFiatEl.innerHTML = `${this._invoice.state.totals.userCurrency}${this._invoice.params.userCurrency}`
+      totalFiatEl.innerText = `${this._invoice.state.totals.userCurrency}${this._invoice.params.userCurrency}`
 
       // Only show in BCH if this is not a static invoice
       if (!this._invoice.params.static) {
-        totalBCHEl.innerHTML = `${this.getTotalAmount() / 100000000}BCH`
+        totalBCHEl.innerText = `${this.getTotalAmount() / 100000000}BCH`
       }
 
       // Set the button text and url
-      buttonEl.innerHTML = options.lang.openInWallet
+      buttonEl.innerText = options.lang.openInWallet
       buttonEl.href = this.getWalletURI()
+
+      // Show the subcontainer
+      subContainerEl.style.display = 'block'
     })
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      buttonEl.innerHTML = options.lang.paymentReceived
+      buttonEl.innerText = options.lang.paymentReceived
+      buttonEl.classList.add('animate__pulse')
 
       // If this is a static invoice
       if (this._invoice.params.static) {
         setTimeout(() => {
-          buttonEl.innerHTML = options.lang.openInWallet
+          buttonEl.innerText = options.lang.openInWallet
+          buttonEl.classList.remove('animate__pulse')
         }, 5000)
       } else { // Otherwise...
         qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
+        qrCodeEl.classList.add('animate__pulse')
         buttonEl.removeAttribute('href')
-        expiresEl.innerHTML = ''
+        expiresEl.innerText = ''
       }
     })
 
     // Trigger on invoice expiry
     this.on('expired', () => {
       qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`
+      qrCodeEl.classList.add('animate__pulse')
       buttonEl.removeAttribute('href')
-      buttonEl.innerHTML = options.lang.expired
-      expiresEl.innerHTML = options.lang.invoiceHasExpired
+      buttonEl.innerText = options.lang.expired
+      buttonEl.classList.add('animate__pulse')
+      expiresEl.innerText = options.lang.invoiceHasExpired
     })
 
     // Trigger each time expiration timer updates
     this.on('timer', (secondsRemaining) => {
       const minutes = Math.floor(secondsRemaining / 60)
       const seconds = secondsRemaining % 60
-      expiresEl.innerHTML = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
+      expiresEl.innerText = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
     })
 
-    // Trigger on error
-    this.on('error', (err) => {
-      console.log(err)
-      errorEl.innerHTML = 'An error occurred'
+    // Trigger on failed
+    this.on('failed', (err) => {
+      errorEl.innerText = err.message
     })
   }
 }

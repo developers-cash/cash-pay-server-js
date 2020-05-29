@@ -1,4 +1,9 @@
 <style>
+  .cashpay-container {
+    display: none;
+    margin-bottom: 1em;
+  }
+
   .cashpay-qr-code {
     width: 100%;
     max-width: 100%;
@@ -13,15 +18,15 @@
     font-weight: 600;
   }
 
-  .cashpay-total-fiat {
+  .cashpay-total-bch {
     float: left;
   }
   
-  .cashpay-total-bch {
+  .cashpay-total-fiat {
     float: right;
   }
   
-  .cashpay-button {
+  a.cashpay-button {
     display: block;
     clear: both;
     text-align: center;
@@ -39,19 +44,25 @@
     text-align: center;
     margin-bottom: 0.5em;
   }
+  
+  .cashpay-error {
+    color: #bb0101;
+    font-weight: bold;
+    text-align: center;
+  }
 </style>
 
-<div class="cashpay-container">
+<div class="cashpay-container animate__animated animate__fadeIn">
   <div class="cashpay-qr-code-container">
-    <img class="cashpay-qr-code" />
+    <img class="cashpay-qr-code animate__animated" />
   </div>
   <div class="cashpay-below">
     <div class="cashpay-details">
-      <div class="cashpay-total-fiat"></div>
       <div class="cashpay-total-bch"></div>
+      <div class="cashpay-total-fiat"></div>
     </div>
-    <a class="cashpay-button"></a>
+    <a class="cashpay-button animate__animated"></a>
     <div class="cashpay-expires"></div>
-    <div class="cashpay-error"></div>
   </div>
 </div>
+<div class="cashpay-error"></div>

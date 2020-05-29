@@ -37,6 +37,10 @@ class Webhook {
     const trusted = this._keys[identity]
 
     // Convert into buffers
+    if (typeof payload === 'string') {
+      payload = Buffer.from(payload)
+    }
+
     if (typeof headers.digest === 'string') {
       headers.digest = Buffer.from(headers.digest, 'base64')
     }
@@ -52,6 +56,11 @@ class Webhook {
 
     // Compare the digest (SHA256 of payload)
     const payloadDigest = Buffer.from(libCash.Crypto.sha256(payload), 'utf8')
+
+    console.log(payload)
+    console.log(headers.digest)
+    console.log(payloadDigest)
+
     if (Buffer.compare(payloadDigest, headers.digest)) {
       throw new Error('Payload digest did not match header digest')
     }
