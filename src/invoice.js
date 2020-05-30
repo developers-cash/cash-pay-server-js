@@ -1,3 +1,5 @@
+const globals = require('./globals')
+
 const _ = require('lodash')
 const axios = require('axios')
 const SocketIO = require('socket.io-client')
@@ -8,64 +10,21 @@ const tick = require('../statics/tick.svg')
 const cross = require('../statics/cross.svg')
 
 /**
-  * Payment Invoice
-  * @example
-  * let invoice = new Invoice({ // Parameters to send to Payment Server
-  *   memo: 'Example Invoice',
-  *   outputs: [ // Multiple Outputs are supported
-  *     {
-  *       address: "bitcoincash:qrhtcm743tttn9spked5y9709dva49t6s5axg730jf"
-  *       amount: 100000 // Amount in Satoshis
-  *     }
-  *   ]
-  * }, { // SDK Options
-  *   endpoint: 'https://payment-service.developers.cash', // Default
-  *   on: { // WebSocket Listeners
-  *     subscribed: (event) => {
-  *       // Websocket is ready and listening
-  *     },
-  *     requested: (event) => {
-  *       // Payment has been requested
-  *     },
-  *     broadcasted: (event) => {
-  *       // Payment has been broadcasted to the network
-  *     },
-  *     error: (event) => {
-  *       // An error occurred
-  *     }
-  *   }
-  * });
+  * Invoice
   *
-  * // Create Invoice
-  * await invoice.create();
-  *
-  * // Output URI to Console
-  * // You probably want to output this as a QR code and link.
-  * console.log(invoice.getWalletURI);
+  * Any field that is prefixed with an underscore is private and should
+  * never be accessed directly.
+  * Any field that is not prefixed by an underscore is considered public
+  * and stable (hence there are no "getter" functions in this class).
+  * Only use setters to modify the parameters of an invoice - do not set
+  * values directly.
   */
 class Invoice {
-  constructor (options, params) {
-    this._options = Object.assign({}, {
-      endpoint: 'https://pay.infra.cash',
-      listen: typeof window !== 'undefined',
-      on: {
-        created: [],
-        connected: [],
-        subscribed: [],
-        requested: [],
-        broadcasted: [],
-        expired: [],
-        timer: [],
-        failed: []
-      }
-    }, options)
+  constructor (options, invoice) {
+    this._options = Object.assign(globals.options, options)
 
-    this._invoice = {
-      params: Object.assign({}, {
-        network: 'main',
-        outputs: [],
-        webhooks: {}
-      }, params)
+    this.invoice = {
+      options: Object.assign(globals.invoice.options, invoice)
     }
 
     // These are computed variables
@@ -94,9 +53,9 @@ class Invoice {
    * let invoice = Invoice.fromExisting(payload);
    * // Websocket events will trigger client-side for above invoice
    */
-  static fromExisting (existingInvoice, options) {
+  static fromExisting (existingInvoice, options = {}) {
     const invoice = new Invoice()
-    invoice._invoice = Object.assign(invoice._invoice, existingInvoice)
+    invoice.invoice = existingInvoice
     invoice._options = Object.assign(invoice._options, options)
 
     return invoice
@@ -122,6 +81,8 @@ class Invoice {
    * This performs an AJAX request to the given server to create the invoice
    * and then sets up the Websocket listener so that the invoice is updated
    * in real-time.
+   * Note if an ID is already allocated to the invoice, a new invoice is not
+   * created.
    */
   async create (container, options) {
     if (container) {
@@ -129,20 +90,18 @@ class Invoice {
     }
 
     try {
-      if (!this._invoice.id) {
-        const invoiceRes = await axios.post(this._options.endpoint + '/invoice/create', this._invoice.params)
-
-        this._invoice.service = invoiceRes.data.service
-        this._invoice = invoiceRes.data.invoice
+      if (!this.invoice.id) {
+        const invoiceRes = await axios.post(this._options.endpoint + '/invoice/create', this.invoice.options)
+        this.invoice = invoiceRes.data
       }
 
       if (this._options.listen) {
         // Setup expiration timer
-        if (!this._invoice.params.static) {
+        if (this.invoice.details.behavior === 'normal') {
           this._setupExpirationTimer()
         }
 
-        // If it has broadcasted or expired, disconnect socket and clear timer
+        // Setup event listener for expired and broadcasted to stop Websocket listener
         this.on(['expired', 'broadcasted'], (secondsRemaining) => {
           clearInterval(this._instance.expiryTimer)
           this._instance.socket.disconnect(true)
@@ -162,17 +121,14 @@ class Invoice {
   }
 
   /**
-   * Get the invoiceID
-   */
-  getId () {
-    return this._invoice.id
-  }
-
-  /**
    * Get the raw invoice object
    */
-  getRawInvoice (omit) {
-    return _.omit(this._invoice)
+  getPayload (fullPayload = false) {
+    if (!fullPayload) {
+      return _.omit(this.invoice, 'options')
+    }
+
+    return this.invoice
   }
 
   /**
@@ -183,78 +139,70 @@ class Invoice {
    * invoice.setMemo("Example payment");
    */
   setMemo (memo) {
-    this._invoice.params.memo = memo
+    this.invoice.options.memo = memo
     return this
   }
 
   /**
-   * Get memo
-   */
-  getMemo () {
-    return this._invoice.params.memo
-  }
-
-  /**
-   * Set Merchant Data
-   * @param data Merchant Data
+   * Set Private Data
+   * @param data Private Data
    * @example
-   * let invoice = new Invoice();
-   * invoice.setData("Example payment");
+   * // Expects a string
+   * invoice.setPrivateData("Example payment");
+   *
+   * // Objects will be automatically cast to a string
    */
-  setData (data) {
-    this._invoice.params.data = data
-    return this
-  }
+  setPrivateData (data) {
+    if (typeof data === 'object') {
+      data = JSON.stringify(data)
+    }
 
-  /**
-   * Get merchant data
-   */
-  getData () {
-    return this._invoice.params.data
+    this.invoice.options.privateData = data
+    return this
   }
 
   /**
    * The unit of fiat (e.g. USD) that will be displayed to the user
-   * @param seconds Seconds from time of creation that Payment Request expires
+   * @param currency The currency code
    * @example
-   * let invoice = new Invoice();
-   * invoice.setExpiration(15 * 60); // 15 Minutes
+   * // Show amount in Australian Dollars
+   * invoice.setUserCurrency('AUD')
    */
   setUserCurrency (currency) {
-    this._invoice.params.userCurrency = currency
+    this.invoice.options.userCurrency = currency
     return this
-  }
-
-  /**
-   * Get user currency
-   */
-  getUserCurrency () {
-    return this._invoice_params.userCurrency
   }
 
   /**
    * Set expiration time
    * @param seconds Seconds from time of creation that Payment Request expires
    * @example
-   * let invoice = new Invoice();
-   * invoice.setExpiration(15 * 60); // 15 Minutes
+   * // 15 minutes
+   * invoice.setExpiration(15 * 60)
    */
   setExpires (seconds) {
-    this._invoice.params.expires = seconds
+    this.invoice.options.expires = seconds
     return this
   }
 
   /**
-   * Get epxiration time
+   * Sets the Merchant Key
+   *
+   * This can be used to debug invoices. It essentially behaves like an API Key
+   * of sorts. If you use this, you should add a point-of-contact so that the
+   * CashPayServer admin can contact you if necessary (e.g. for breaking changes
+   * or critical security vulnerabilities).
+   * @example
+   * invoice.setMerchantKey('https://t.me/yourname|SECURE_STRING')
    */
-  getExpires () {
-    return this._invoice.params.expires
+  setMerchantKey (key) {
+    this._options.merchantKey = key
   }
 
   /**
    * Set Webhook
-   * @param events The type of Webhook (requested, broadcasted, etc)
-   * @param endpoint The endpoint that should be hit
+   * @param {Array|String} events The type of Webhook (requested, broadcasted, etc)
+   * @param {String} endpoint The endpoint that should be hit
    * @example
    * let invoice = new Invoice();
    * invoice.setWebhook("broadcasted", ');
@@ -264,15 +212,15 @@ class Invoice {
       events = [events]
     }
 
-    events.forEach(event => { this._invoice.params.webhooks[event] = endpoint })
+    events.forEach(event => { this.invoice.options.webhooks[event] = endpoint })
 
     return this
   }
 
   /**
    * Add an address output to Invoice.
-   * @param address CashAddress
-   * @param amount Amount in satoshis
+   * @param {String} address Bitcoin Cash address
+   * @param {String|Number} amount Amount in satoshis or string with currency code suffix
    * @example
    * let invoice = new Invoice();
    * invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", 100000);
@@ -281,7 +229,7 @@ class Invoice {
    * invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.50USD");
    */
   addAddress (address, amount) {
-    this._invoice.params.outputs.push({
+    this.invoice.options.outputs.push({
       address: address,
       amount: amount || 0
     })
@@ -295,7 +243,7 @@ class Invoice {
    * @param amount Amount in satoshis
    */
   addOutput (script, amount) {
-    this._invoice.params.outputs.push({
+    this.invoice.options.outputs.push({
       script: script,
       amount: amount || 0
     })
@@ -308,23 +256,32 @@ class Invoice {
    * @param address The address to look for
    * @param amount The amount it must equal
    */
-  hasOutput (address, amount) {
-    const output = this._invoice.params.outputs.find(output => output.address === address)
+  /* hasOutput (address, amount) {
+    const output = this.invoice.options.outputs.find(output => output.address === address)
 
     if (!output) {
       return false
     }
 
     return output.amount === amount
-  }
+  } */
 
   /**
    * Make this invoice a static invoice
-   * @param quantity Number of re-uses allowed
-   * @param expires How long this static invoice can be used for
+   * @param {object} opts Options for static invoice
+   * @example
+   * // Infinite re-use, no expiration
+   * invoice.staticInvoice()
+   *
+   * // Re=usable ten times, valid until end of 2020
+   * invoice.staticInvoice({
+   *   quantity: 10,
+   *   validUntil: "2020-12-31T01:00:00.992Z"
+   * })
    */
-  staticInvoice () {
-    this._invoice.params.static = true
+  staticInvoice (opts) {
+    this.invoice.options.behavior = 'static'
+    this.invoice.options.static = opts
 
     return this
   }
@@ -345,45 +302,15 @@ class Invoice {
   }
 
   /**
-   * Returns the Wallet URI.
-   * @example
-   * invoice.getWalletURI()
-   * // bitcoincash:?r=https://pay.bip70.cash/invoice/pay/5e5a332c356cbd08f218521a
-   */
-  getWalletURI () {
-    return _.get(this, '_invoice.service.walletURI', '')
-  }
-
-  getTotalAmount () {
-    return this._invoice.state.outputs.reduce((total, output) => total + output.amount, 0)
-  }
-
-  /**
-   * Returns true if the payment details of this invoice have been requested.
-   * If you are using a Reactive Framework (e.g. VueJS) you can render state based on this.
-   */
-  isRequested () {
-    return _.get(this, '_invoice.state.requested')
-  }
-
-  /**
-   * Returns true if the payment has been broadcasted to the network.
-   * If you are using a Reactive Framework (e.g. VueJS) you can render state based on this.
-   */
-  isBroadcasted () {
-    return _.get(this, '_invoice.state.broadcasted')
-  }
-
-  /**
    * Setup WebSocket listener.
    * This should not need to be called manually
    */
   async _listen () {
-    this._instance.socket = SocketIO(this._invoice.service.webSocketURI)
+    this._instance.socket = SocketIO(this.invoice.service.webSocketURI)
 
     this._instance.socket.on('connect', () => {
       this._instance.socket.emit('subscribe', {
-        invoiceId: this._invoice.id
+        invoiceId: this.invoice.id
       })
     })
 
@@ -392,12 +319,12 @@ class Invoice {
     })
 
     this._instance.socket.on('requested', (msg) => {
-      this._invoice = msg.invoice
+      this.invoice = msg.invoice
       this._options.on.requested.forEach(cb => cb(msg))
     })
 
     this._instance.socket.on('broadcasted', (msg) => {
-      this._invoice = msg.invoice
+      this.invoice = msg.invoice
       this._options.on.broadcasted.forEach(cb => cb(msg))
     })
 
@@ -413,7 +340,7 @@ class Invoice {
    */
   _setupExpirationTimer () {
     this._instance.expiryTimer = setInterval(() => {
-      const expires = new Date(this._invoice.state.expires * 1000).getTime()
+      const expires = new Date(this.invoice.details.expires * 1000).getTime()
       const now = new Date().getTime()
       const secondsRemaining = Math.round((expires - now) / 1000)
 
@@ -443,8 +370,10 @@ class Invoice {
       }
     }, options)
 
-    // Inject template
-    container.innerHTML = options.template
+    // Inject template (otherwise, assume it's already there)
+    if (options.template) {
+      container.innerHTML = options.template
+    }
 
     // Find container elements
     const subContainerEl = container.querySelector('.cashpay-container')
@@ -458,7 +387,7 @@ class Invoice {
     // Trigger on invoice creation...
     this.on('created', async () => {
       // Render QR Code
-      qrCodeEl.src = await QRCode.toDataURL(this.getWalletURI(), {
+      qrCodeEl.src = await QRCode.toDataURL(this.invoice.service.walletURI, {
         color: {
           dark: options.color
         },
@@ -467,16 +396,16 @@ class Invoice {
       })
 
       // Set totals for BCH and Fiat
-      totalFiatEl.innerText = `${this._invoice.state.totals.userCurrency}${this._invoice.params.userCurrency}`
+      totalFiatEl.innerText = `${this.invoice.details.meta.userCurrencyTotal}${this.invoice.details.meta.userCurrency}`
 
       // Only show in BCH if this is not a static invoice
-      if (!this._invoice.params.static) {
-        totalBCHEl.innerText = `${this.getTotalAmount() / 100000000}BCH`
+      if (this.invoice.details.behavior === 'normal') {
+        totalBCHEl.innerText = `${this.invoice.details.meta.satoshiTotal / 100000000}BCH`
       }
 
       // Set the button text and url
       buttonEl.innerText = options.lang.openInWallet
-      buttonEl.href = this.getWalletURI()
+      buttonEl.href = this.invoice.service.walletURI
 
       // Show the subcontainer
       subContainerEl.style.display = 'block'
@@ -488,7 +417,7 @@ class Invoice {
       buttonEl.classList.add('animate__pulse')
 
       // If this is a static invoice
-      if (this._invoice.params.static) {
+      if (this.invoice.details.behavior === 'static') {
         setTimeout(() => {
           buttonEl.innerText = options.lang.openInWallet
           buttonEl.classList.remove('animate__pulse')
