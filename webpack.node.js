@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+    node: false,
     entry: {
         main: __dirname + '/src/index.js'
     },
@@ -13,7 +14,7 @@ module.exports = {
     },
     module: {
       rules: [
-        {
+        /*{
           test: /\.js$/,
           loader: 'babel-loader',
           exclude: /node_modules/,
@@ -27,7 +28,7 @@ module.exports = {
               }]
             ],
           }
-        },
+        },*/
         {
           test: /\.css$/,
           use: ['style-loader', 'css-loader']

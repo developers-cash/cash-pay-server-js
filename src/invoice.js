@@ -20,11 +20,11 @@ const cross = require('../statics/cross.svg')
   * values directly.
   */
 class Invoice {
-  constructor (options, invoice) {
-    this._options = Object.assign(globals.options, options)
+  constructor (options = {}, invoice = {}) {
+    this._options = Object.assign({}, _.cloneDeep(globals.options), options)
 
     this.invoice = {
-      options: Object.assign(globals.invoice.options, invoice)
+      options: Object.assign({}, _.cloneDeep(globals.invoice.options), invoice)
     }
 
     // These are computed variables
@@ -56,7 +56,7 @@ class Invoice {
   static fromExisting (existingInvoice, options = {}) {
     const invoice = new Invoice()
     invoice.invoice = existingInvoice
-    invoice._options = Object.assign(invoice._options, options)
+    invoice._options = Object.assign({}, invoice._options, options)
 
     return invoice
   }
