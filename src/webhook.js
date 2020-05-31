@@ -1,4 +1,3 @@
-const _ = require('lodash')
 const axios = require('axios')
 
 const BitcoinCashJS = require('bitcoincashjs-lib')
@@ -30,18 +29,23 @@ class Webhook {
    * Verifies a Webhook Payload
    */
   async verifySignature (payload, headers) {
-    let digest = headers['digest']
-    let identity = headers['x-identity']
+    let digest = headers.digest
+    const identity = headers['x-identity']
     let signature = headers['x-signature']
-    let signatureType = headers['x-signature-type']
-    
+    const signatureType = headers['x-signature-type']
+
+    // Make sure signature type is ECC
+    if (signatureType !== 'ECC') {
+      throw new Error(`x-signature-type must be ECC (current value ${signatureType})`)
+    }
+
     const trusted = this._keys[identity]
 
     // Convert into buffers
     if (typeof payload === 'object') {
       payload = JSON.stringify(payload)
     }
-    
+
     if (typeof payload === 'string') {
       payload = Buffer.from(payload)
     }
@@ -65,7 +69,7 @@ class Webhook {
     if (Buffer.compare(payloadDigest, digest)) {
       throw new Error('Payload digest did not match header digest')
     }
-    
+
     const correct = this._keys[identity].publicKeys.reduce((isValid, publicKey) => {
       const ecPair = libCash.ECPair.fromPublicKey(Buffer.from(publicKey, 'hex'))
       const result = isValid += libCash.ECPair.verify(
