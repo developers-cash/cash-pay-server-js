@@ -29,10 +29,10 @@ const cross = require('../statics/cross.svg')
   *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
   *   .setWebhooks(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
   * await invoice.create()
-  * 
+  *
   * // Send Payload JSON to browser
   * return invoice.getPayload()
-  * 
+  *
   * //
   * // Client-side
   * //
@@ -46,22 +46,22 @@ class Invoice {
   constructor (opts = {}, invoice = {}) {
     /**
      * ID of the invoice
-     * 
+     *
      * Only accessible once invoice is created and should not be mutated directly.
      * @example
      * let invoice = new Invoice()
      *  .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
      * await invoice.create()
-     * 
+     *
      * console.log(invoice.id)
      */
     this.id = null
-    
+
     /**
      * Details of the invoice
-     * 
+     *
      * Only accessible once invoice is created and should not be mutated directly.
-     * 
+     *
      * An example of properties available is provided below.
      * @example
      * {
@@ -82,14 +82,14 @@ class Invoice {
      * }
      */
     this.details = {}
-    
+
     /**
      * State of the invoice
-     * 
+     *
      * This can be used in reactive applications to render UI state.
-     * 
+     *
      * Only accessible once invoice is created and should not be mutated directly.
-     * 
+     *
      * An example of properties available is provided below.
      * @example
      * {
@@ -105,12 +105,12 @@ class Invoice {
      * }
      */
     this.state = {}
-    
+
     /**
      * Service URL's for this invoice
-     * 
+     *
      * Only accessible once invoice is created and should not be mutated directly.
-     * 
+     *
      * An example of properties available is provided below.
      * @example
      * {
@@ -121,10 +121,10 @@ class Invoice {
      * }
      */
     this.service = {}
-    
+
     /**
      * Options that will be passed to the CashPayServer upon invoice creation
-     * 
+     *
      * @example
      * {
      *   behavior: { type: String, default: 'normal' },
@@ -149,13 +149,13 @@ class Invoice {
      * }
      */
     this.options = Object.assign({ static: {} }, _.cloneDeep(config.invoice), invoice)
-    
+
     this._instance = Object.assign({}, _.cloneDeep(config.options), opts)
   }
 
   /**
    * Create an instance from an existing invoice.
-   * 
+   *
    * This should be used if, for example, the invoice is being created from a server-side endpoint.
    * @param {object} existingInvoice The existing invoice (created from the server-side)
    * @param {object} options List of options to set upon creation.
@@ -188,14 +188,14 @@ class Invoice {
     const res = await axios.post(endpoint, params, options)
     return this.fromExisting(res.data)
   }
-  
+
   /**
    * Add an event handler.
-   * 
+   *
    * Most of these events will be sent by the WebSocket connection.
-   * 
+   *
    * Supported events are:
-   * 
+   *
    * "created", "broadcasting", "broadcasted", "expired", "failed"
    * @param {(string|array)} events Event to handle (or array of events)
    * @param callback Callback function
@@ -206,7 +206,7 @@ class Invoice {
    *   .on('failed', (err) {
    *     alert(err.message)
    *   }
-   * 
+   *
    * // Add event listener for broadcasting and broadcasted event
    * let invoice = new CashPay.Invoice()
    *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1AAAA')
@@ -223,7 +223,7 @@ class Invoice {
 
     return this
   }
-  
+
   /**
    * Add an address output to Invoice.
    * @param {String} address Bitcoin Cash address
@@ -246,7 +246,7 @@ class Invoice {
 
   /**
    * Add a script output to the Invoice.
-   * 
+   *
    * Note that this is not supported by JSONPaymentProtocol.
    * @param {string} script Raw output script (in hexadecimal)
    * @param {number} [amount=0] Amount in satoshis
@@ -262,7 +262,7 @@ class Invoice {
 
     return this
   }
-  
+
   /**
    * Set expiration time
    * @param {number} seconds Seconds from time of creation that Payment Request expires
@@ -274,7 +274,7 @@ class Invoice {
     this.options.expires = seconds
     return this
   }
-  
+
   /**
    * Sets the Merchant Key
    *
@@ -302,7 +302,7 @@ class Invoice {
 
   /**
    * Sets Private Data against the invoice.
-   * 
+   *
    * Private data is stored under the 'options' object of an invoice and should never be exposed to the end user.
    * @param {(string|object)} data If an object is passed, this will be converted to a string.
    * @example
@@ -334,7 +334,7 @@ class Invoice {
     this.options.userCurrency = currency
     return this
   }
-  
+
   /**
    * Set Webhook
    * @param {(Array|String)} events The type of Webhook (requested, broadcasted, etc)
@@ -343,7 +343,7 @@ class Invoice {
    * // Set single Webhook
    * let invoice = new Invoice();
    * invoice.setWebhook("broadcasted", 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
-   * 
+   *
    * // Set multiple Webhooks
    * let invoice = new Invoice();
    * invoice.setWebhook(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
@@ -377,24 +377,24 @@ class Invoice {
 
     return this
   }
-  
+
   /**
    * Create the invoice.
-   * 
+   *
    * If "id" does not exist on invoice, a new Invoice will be requested from the CashPayServer.
    * @param {DOMElement} [container] DOM Element to render CashPay in
    * @param {Object} [options] Options for container rendering
    * @example
-   * // Using default container 
+   * // Using default container
    * let invoice = new CashPay.Invoice()
    * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
    * await invoice.create(document.getElementById('invoice-container'))
-   * 
+   *
    * // Using default container with options
    * let invoice = new CashPay.Invoice()
    * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
    * await invoice.create(document.getElementById('invoice-container'), { color: '#000' })
-   * 
+   *
    * // No Container (e.g. handle rendering with reactive properties)
    * let invoice = new CashPay.Invoice()
    * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
@@ -438,15 +438,15 @@ class Invoice {
 
   /**
    * Get the payload of the invoice.
-   * 
+   *
    * This function can be used to pass the invoice back to the browser from the server-side.
    * @param {boolean} [publicOnly=true] Only return properties that should be visible to the end user (hide private options)
    * @example
    * // Get JSON payload
    * let payload = invoice.getPayload()
-   * 
+   *
    * // Get FULL JSON payload (security risk!)
-   * let payload = invoice.getPayload(true) 
+   * let payload = invoice.getPayload(true)
    */
   payload (publicOnly = true) {
     if (publicOnly) {
@@ -455,7 +455,7 @@ class Invoice {
 
     return _.omit(this, '_instance')
   }
-  
+
   /**
    * @private
    * Setup WebSocket listener.

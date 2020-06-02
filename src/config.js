@@ -1,12 +1,12 @@
 /**
  * Global Config used by Cash Pay Server
- * 
+ *
  * These are usually default values that will be used when an invoice is created.
- * 
+ *
  * @example
  * // Use a self-hosted server
  * CashPay.config.options.endpoint = 'https://cash-pay.self-hoster.com'
- * 
+ *
  * // Show/calculate totals in Australian dollars
  * CashPay.config.invoice.userCurrency = 'AUD'
  *
@@ -14,10 +14,10 @@
  * let invoice == CashPay.Invoice(...)
  */
 class Config {
-  constructor() {
+  constructor () {
     /**
      * Instance options for Invoice
-     * 
+     *
      * Default values and valid properties are shown below in the example.
      * @example
      * {
@@ -40,10 +40,10 @@ class Config {
         failed: []
       }
     }
-    
+
     /**
      * Default Invoice Properties
-     * 
+     *
      * Default values and valid properties are shown below in the example
      * @example
      * {
@@ -63,4 +63,4 @@ class Config {
   }
 }
 
-module.exports = new Config
+module.exports = new Config()

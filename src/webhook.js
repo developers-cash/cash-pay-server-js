@@ -8,13 +8,13 @@ const libCash = new LibCash()
 
 /**
   * (NOT AVAILABLE WHEN INCLUDED FROM CDN)
-  * 
+  *
   * This class contains useful utilities for verifying CashPayServer Webhook signatures.
   * @example
   * // Create instance
   * let webhook = new CashPayServer.Webhook()
   * await webhook.addTrust('https://pay.infra.cash')
-  * 
+  *
   * // Validate Webhook when it is received
   * webhook.verifySignature(payload, httpHeaders)
   */
@@ -25,7 +25,7 @@ class Webhook {
 
   /**
    * Add a Cash Pay Server to trusted servers list.
-   * 
+   *
    * This will automatically update the Public Keys when they have expired.
    * @param {string} endpoint Endpoint of the Cash Pay Server
    * @example
@@ -46,7 +46,7 @@ class Webhook {
 
   /**
    * Verifies the signature of a Webhook Payload
-   * 
+   *
    * @param {(string|object)} payload String or Object containing the payload
    * @param {object} headers HTTP Headers (requires digest, x-identity, x-signature-type and x-signature)
    * @example
