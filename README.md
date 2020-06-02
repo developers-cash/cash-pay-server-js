@@ -1,108 +1,76 @@
-# BIP70.Cash
 
-A Bitcoin Cash service to take the hassle out of receiving BIP70 payments. Tested with:
+# Cash-Pay-Server-JS
 
-- Electron Cash
-- Bitcoin.com Wallet
+Javascript library for use with Cash Pay Servers.
 
 ## Usage
 
-Include the bip70cash NPM package in your project.
+Include the `cash-pay-server-js` NPM package in your project.
 
-```
-npm install bip70cash --save
+```bash
+npm install @developers.cash/cash-pay-server-js --save
 ```
 
 ... or alternatively, load it from a CDN:
 
-```
-Coming soon.
+```html
+<script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
 ```
 
-Then just simply create an invoice:
+Create an invoice on your server-side:
 
-```
-const BIP70Invoice = require('bip70cash');
+```javascript
+const CashPay = require('cash-pay-server-js')
 
 // ...
 
-let invoice = await BIP70Invoice({
-  address: 'bitcoincash:qz2fn6wwwxs2wcdf9cfdhv4ln0qvjadg6csjcjasuf',
-  amount: 10000,
-  on: {
-    requested: (invoice) => {
-      console.log('Payment request has been received');
-    },
-    broadcasted: (invoice) => {
-      console.log('Payment request has been broadcasted');
-    }
-  }
-});
+// Create invoice
+let invoice = new CashPay.Invoice()
+  .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
+  .setPrivateData({ invoiceId: 'ABC123' })
+  .setWebhook(['broadcasting', 'broadcasted'], 'https://webhook.site/63295fd3-132c-45ac-a198-d26e1abdef19')
+await invoice.create()
+
+// Return payload to client-side
+return invoice.payload()
 ```
 
-The bip70cash package will automatically check to see if the payment has been broadcasted and gives you hooks to work with.
+Render the created invoice on your client-side
 
-Alternatively, if you're using a Reactive Framework like Vue, you can also check the state directly.
+```javascript
+// Request invoice from server endpoint
+let invoice = await CashPay.Invoice.fromServerEndpoint('./request-invoice', {
+  // Params to pass to server-side
+})
 
+invoice.on(['broadcasting', 'broadcasted'], e => {
+  // Do something when invoice has been paid paid
+  console.log(e)
+})
+
+// Render the default Invoice UI in a HTML container
+await invoice.create(document.getElementById('invoice-container'))
 ```
-<div v-if="invoice && !invoice.state.broadcasted">
-  <qrcode :value="invoice.walletURI" />
-</div>
-<div v-if="invoice && invoice.state.broadcasted">
-  <q-icon name="check_circle_outline" class="text-primary" style="font-size:400px;" />
-</div>
+
+If you need to mark the invoice as paid in your backend database (or similar), setup a Webhook endpoint:
+
+```javascript
+const CashPay = require('cash-pay-server-js')
+
+// Add the CashPayServer you're using as trusted
+let webhook = new CashPay.Webhook()
+await webhook.addTrusted('https://pay.infra.cash')
+
+//
+// HTTP POST /webhook endpoint
+//
+await webhook.verifySignature(req.body, req.headers)
+
+// Save to server (or similar)
+console.log(req.body)
 ```
 
-## Options
+For more in-depth guides, see the following resources:
 
-The bip70cash package allows you to specify additional options:
-
-```
-let invoice = await BIP70Invoice({
-  // Address you wish to send to
-  address: 'bitcoincash:qz2fn6wwwxs2wcdf9cfdhv4ln0qvjadg6csjcjasuf',
-
-  // Amount to send to (in satoshis)
-  amount: 10000,
-  
-  // Or you can specify multiple outputs (the above is just shorthand)
-  outputs: [
-    {
-      address: 'bitcoincash:qz2fn6wwwxs2wcdf9cfdhv4ln0qvjadg6csjcjasuf',
-      amount: 10000
-    },
-    {
-      address: 'bitcoincash:qz2fn6wwwxs2wcdf9cfdhv4ln0qvjadg6csjcjasuf',
-      amount: 1000
-    },
-    // You can also attach a script
-    // NOTE: DOES NOT WORK WITH BITCOIN.COM WALLET (TESTED AS OF 2020-01-10)
-    {
-      "script": "OP_RETURN 14 0x68656c6c6f20776f726c64212121"
-    }
-  ],
-  
-  // Callback hooks for events
-  on: {
-    requested: (invoice) => {
-      console.log('Payment request has been received');
-    },
-    broadcasted: (invoice) => {
-      console.log('Payment request has been broadcasted');
-    }
-  },
-  
-  // Receive a Webhook when a wallet retrieves information about this invoice (Payment Request)
-  requestedWebhook: "http://webhook.site/ce7174b4-ce9f-41de-81b6-f7aafbbcb14f",
-  
-  // Receive a Webhook when the transaction is broadcasted
-  broadcastedWebhook: "http://webhook.site/ce7174b4-ce9f-41de-81b6-f7aafbbcb14f",
-  
-  // Receive a Webhook when an error occurs
-  errorWebhook: "http://webhook.site/ce7174b4-ce9f-41de-81b6-f7aafbbcb14f",
-  
-  // Many wallets don't implement BIP70 correctly. Some workarounds have been implemented to handle this.
-  // This parameter should be used for Wallet Testing and the errorWebhook above intends to complement it:
-  workarounds: false
-});
-```
+[Guides](https://github.com/developers-cash/cash-pay-server-resources/tree/master/guide)
+[Javascript API](https://github.com/developers-cash/cash-pay-server-resources/blob/master/api/cash-pay-server-js.md)

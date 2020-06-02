@@ -7,13 +7,32 @@ const LibCash = require('@developers.cash/libcash-js')
 const libCash = new LibCash()
 
 /**
-  * Webhook class
+  * (NOT AVAILABLE WHEN INCLUDED FROM CDN)
+  * 
+  * This class contains useful utilities for verifying CashPayServer Webhook signatures.
+  * @example
+  * // Create instance
+  * let webhook = new CashPayServer.Webhook()
+  * await webhook.addTrust('https://pay.infra.cash')
+  * 
+  * // Validate Webhook when it is received
+  * webhook.verifySignature(payload, httpHeaders)
   */
 class Webhook {
   constructor (options) {
     this._keys = {}
   }
 
+  /**
+   * Add a Cash Pay Server to trusted servers list.
+   * 
+   * This will automatically update the Public Keys when they have expired.
+   * @param {string} endpoint Endpoint of the Cash Pay Server
+   * @example
+   * // Add 'pay.infra.cash' and 'dev.pay.infra.cash'
+   * webhook.addTrusted('https://pay.infra.cash')
+   * webhook.addTrusted('https://dev.pay.infra.cash')
+   */
   async addTrusted (endpoint) {
     const res = await axios.get(`${endpoint}/signingKeys/paymentProtocol.json`)
     this._keys[res.data.owner] = {
@@ -26,7 +45,13 @@ class Webhook {
   }
 
   /**
-   * Verifies a Webhook Payload
+   * Verifies the signature of a Webhook Payload
+   * 
+   * @param {(string|object)} payload String or Object containing the payload
+   * @param {object} headers HTTP Headers (requires digest, x-identity, x-signature-type and x-signature)
+   * @example
+   * // ExpressJS
+   * webhook.verifySignature(req.body, req.headers)
    */
   async verifySignature (payload, headers) {
     let digest = headers.digest

@@ -1,9 +1,9 @@
-const globals = require('./globals')
+const config = require('./config')
 const Invoice = require('./invoice')
 const Webhook = require('./webhook')
 
 module.exports = {
-  globals: globals,
+  config: config,
   Invoice: Invoice,
   Webhook: Webhook
 }

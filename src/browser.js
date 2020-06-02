@@ -1,7 +1,7 @@
-const globals = require('./globals')
+const config = require('./config')
 const Invoice = require('./invoice')
 
 module.exports = {
-  globals: globals,
+  config: config,
   Invoice: Invoice
 }
