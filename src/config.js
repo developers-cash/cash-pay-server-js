@@ -5,7 +5,7 @@
  *
  * @example
  * // Use a self-hosted server
- * CashPay.config.options.endpoint = 'https://cash-pay.self-hoster.com'
+ * CashPay.config.options.endpoint = 'https://cash-pay.self-hosted.com'
  *
  * // Show/calculate totals in Australian dollars
  * CashPay.config.invoice.userCurrency = 'AUD'
@@ -26,7 +26,7 @@ class Config {
      * }
      */
     this.options = {
-      endpoint: 'https://pay.infra.cash',
+      endpoint: 'https://v1.pay.infra.cash',
       listen: typeof window !== 'undefined',
       on: {
         created: [],
