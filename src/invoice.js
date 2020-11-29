@@ -337,20 +337,13 @@ class Invoice {
   /**
    * <p>Get the payload of the invoice.</p>
    * <p>This function can be used to pass the invoice back to the browser from the server-side.</p>
-   * @param {boolean} [publicOnly=true] Only return properties that should be visible to the end user (hide private options)
+   * <p><small>The fields [apiKey, privateData, webhook, events] will be omitted from the payload</small></p>
    * @example
    * // Get JSON payload
    * let payload = invoice.getPayload()
-   *
-   * // Get FULL JSON payload (security risk!)
-   * let payload = invoice.getPayload(true)
    */
-  payload (publicOnly = true) {
-    if (publicOnly) {
-      return _.omit(this, 'options', '_instance')
-    }
-
-    return _.omit(this, '_instance')
+  payload () {
+    return _.omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
   }
 
   /**
