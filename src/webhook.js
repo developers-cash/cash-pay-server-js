@@ -13,7 +13,7 @@ const libCash = new LibCash()
   * @example
   * // Create instance
   * let webhook = new CashPayServer.Webhook()
-  * await webhook.addTrust('https://pay.infra.cash')
+  * await webhook.addTrust('https://v1.pay.infra.cash')
   *
   * // Validate Webhook when it is received
   * webhook.verifySignature(payload, httpHeaders)

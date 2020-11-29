@@ -17,7 +17,8 @@
     "prepublishOnly": "npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "docs": "jsdoc src -c jsdoc.json -d ../cash-pay-server-js-ghpages"
   },
   "keywords": [
     "bip70",
@@ -42,6 +43,7 @@
     "html-loader": "^1.1.0",
     "style-loader": "^1.2.1",
     "svg-inline-loader": "^0.8.2",
+    "tui-jsdoc-template": "^1.2.2",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },

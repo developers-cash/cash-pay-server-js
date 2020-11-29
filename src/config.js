@@ -53,12 +53,10 @@ class Config {
      * }
      */
     this.invoice = {
-      behavior: 'normal',
       network: 'main',
       outputs: [],
       userCurrency: 'USD',
-      webhooks: {},
-      static: {}
+      webhook: {}
     }
   }
 }

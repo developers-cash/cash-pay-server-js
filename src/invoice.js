@@ -10,14 +10,18 @@ const tick = require('../statics/tick.svg')
 const cross = require('../statics/cross.svg')
 
 /**
-  * A Cash Payment Server Invoice
-  *
-  * Any field that is prefixed with an underscore is private and should
-  * never be accessed directly.
-  * Any field that is not prefixed by an underscore is considered public
+  * <p>A Cash Payment Server Invoice</p>
+  * <p>Invoices can be created client-side or server-side. However, for security
+  * reasons, it is recommended that invoices are created server-side and passed
+  * back to the client-side.</p>
+  * <p><small><strong>Note:</strong> Any field that is prefixed with an underscore
+  * is private and should never be accessed directly.</small></p>
+  * <p><small><strong>Note:</strong> Any field that is not prefixed by an
+  * underscore is considered public
   * and stable (hence there are no "getter" functions in this class).
   * Only use setters to modify the parameters of an invoice - do not set
-  * values directly.
+  * values directly.</small></p>
+  *
   * @param {object} opts Options for invoice instance (use setters instead)
   * @param {object} invoice Invoice properties (use setters instead)
   * @example
@@ -27,7 +31,7 @@ const cross = require('../statics/cross.svg')
   * let invoice = new CashPay.Invoice()
   *   .setMerchantKey('your.site|SECURE_KEY_123')
   *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-  *   .setWebhooks(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+  *   .setWebhooks(['https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
   * await invoice.create()
   *
   * // Send Payload JSON to browser
@@ -44,119 +48,15 @@ const cross = require('../statics/cross.svg')
   */
 class Invoice {
   constructor (opts = {}, invoice = {}) {
-    /**
-     * ID of the invoice
-     *
-     * Only accessible once invoice is created and should not be mutated directly.
-     * @example
-     * let invoice = new Invoice()
-     *  .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-     * await invoice.create()
-     *
-     * console.log(invoice.id)
-     */
-    this.id = null
+    this._instance = {}
 
-    /**
-     * Details of the invoice
-     *
-     * Only accessible once invoice is created and should not be mutated directly.
-     *
-     * An example of properties available is provided below.
-     * @example
-     * {
-     *   "behavior": String, // "normal" or "static" for Static Invoice
-     *   "network": String, // "main" or "testnet"
-     *   "time": Number, // Unix timestamp of Invoice creation
-     *   "expires": Number, // Unix timestamp of when Invoice expires
-     *   "outputs": [], // Outputs of transaction
-     *   "memo": String, // Memo of transaction
-     *   "meta": { // Meta information about the invoice (e.g. totals
-     *     "satoshiTotal": Number,
-     *     "baseCurrency": String,
-     *     "baseCurrencyTotal": Number,
-     *     "userCurrency": String,
-     *     "userCurrencyTotal": Number,
-     *   }
-     *   "txIds": [String], // Array of Strings
-     * }
-     */
-    this.details = {}
-
-    /**
-     * State of the invoice
-     *
-     * This can be used in reactive applications to render UI state.
-     *
-     * Only accessible once invoice is created and should not be mutated directly.
-     *
-     * An example of properties available is provided below.
-     * @example
-     * {
-     *   "events": { // Dates for when these events first occurred on the invoice
-     *     "requested": Date,
-     *     "broadcasting": Date,
-     *     "broadcasted": Date,
-     *     "confirmed": Date
-     *   },
-     *   "static": { // If this is a static invoice, these properties will be available
-     *     "quantityUsed": Number
-     *   }
-     * }
-     */
-    this.state = {}
-
-    /**
-     * Service URL's for this invoice
-     *
-     * Only accessible once invoice is created and should not be mutated directly.
-     *
-     * An example of properties available is provided below.
-     * @example
-     * {
-     *   "paymentURI": String,
-     *   "stateURI": String,
-     *   "walletURI": String,
-     *   "webSocketURI": String,
-     * }
-     */
-    this.service = {}
-
-    /**
-     * Options that will be passed to the CashPayServer upon invoice creation
-     *
-     * @example
-     * {
-     *   behavior: { type: String, default: 'normal' },
-     *   network: { type: String, default: 'main' },
-     *   outputs: [{ amount: String, address: String, script: String }],
-     *   expires: Number,
-     *   memo: String,
-     *   merchantKey: { type: String, index: true },
-     *   privateData: String,
-     *   static: {
-     *     validUntil: Date,
-     *     quantity: Number
-     *   },
-     *   userCurrency: { type: String, default: 'USD' },
-     *   webhooks: {
-     *     requested: String,
-     *     broadcasting: String,
-     *     broadcasted: String,
-     *     confirmed: String,
-     *     error: String
-     *   }
-     * }
-     */
-    this.options = Object.assign({ static: {} }, _.cloneDeep(config.invoice), invoice)
-
-    this._instance = Object.assign({}, _.cloneDeep(config.options), opts)
+    Object.assign(this, _.cloneDeep(config.invoice), invoice)
+    Object.assign(this._instance, _.cloneDeep(config.options), opts)
   }
 
   /**
-   * Create an instance from an existing invoice.
-   *
-   * This should be used if, for example, the invoice is being created from a server-side endpoint.
+   * <p>Create an instance from an existing invoice.</p>
+   * <p>This should be used if, for example, the invoice is being created from a server-side endpoint.</p>
    * @param {object} existingInvoice The existing invoice (created from the server-side)
    * @param {object} options List of options to set upon creation.
    * @example
@@ -166,14 +66,14 @@ class Invoice {
   static fromExisting (existingInvoice, options = {}) {
     const invoice = new Invoice()
     Object.assign(invoice, existingInvoice)
-    invoice._options = Object.assign({}, invoice._options, options)
+    invoice._instance = Object.assign({}, config.options, options)
 
     return invoice
   }
 
   /**
-   * Convenience function to create an invoice from the data returned from
-   * the given server-side endpoint.
+   * <p>Convenience function to create an invoice from the data returned from
+   * the given server-side endpoint.</p>
    * @param {string} endpoint The endpoint to retreive the invoice from
    * @param {object} params The parameters to pass to the endpoint
    * @param {object} options The options to specify (see axios.post options)
@@ -190,13 +90,16 @@ class Invoice {
   }
 
   /**
-   * Add an event handler.
-   *
-   * Most of these events will be sent by the WebSocket connection.
-   *
-   * Supported events are:
-   *
-   * "created", "broadcasting", "broadcasted", "expired", "failed"
+   * <p>Add an event handler.</p>
+   * <p>Most of these events will be sent by the WebSocket connection.</p>
+   * <p>Supported events are:</p>
+   * <ul>
+   *  <li>created</li>
+   *  <li>broadcasting</li>
+   *  <li>broadcasted</li>
+   *  <li>expired</li>
+   *  <li>failed</li>
+   * </ul>
    * @param {(string|array)} events Event to handle (or array of events)
    * @param callback Callback function
    * @example
@@ -236,7 +139,7 @@ class Invoice {
    * invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.50USD");
    */
   addAddress (address, amount) {
-    this.options.outputs.push({
+    this.outputs.push({
       address: address,
       amount: amount || 0
     })
@@ -245,9 +148,8 @@ class Invoice {
   }
 
   /**
-   * Add a script output to the Invoice.
-   *
-   * Note that this is not supported by JSONPaymentProtocol.
+   * <p>Add a script output to the Invoice.</p>
+   * <p>Note that this is not supported by JSONPaymentProtocol.</p>
    * @param {string} script Raw output script (in hexadecimal)
    * @param {number} [amount=0] Amount in satoshis
    * @example
@@ -255,7 +157,7 @@ class Invoice {
    * invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')
    */
   addOutput (script, amount = 0) {
-    this.options.outputs.push({
+    this.outputs.push({
       script: script,
       amount: amount
     })
@@ -271,21 +173,8 @@ class Invoice {
    * invoice.setExpiration(15 * 60)
    */
   setExpires (seconds) {
-    this.options.expires = seconds
+    this.expires = seconds
     return this
-  }
-
-  /**
-   * Sets the Merchant Key
-   *
-   * If a Merchant sets this key, it gives them elevated access to an invoice meaning they
-   * can use this later to retrieve a list of invoices (with this key set) that failed and
-   * manually re-trigger the sending of Webhooks.
-   * @example
-   * invoice.setMerchantKey('https://t.me/yourname|SECURE_STRING')
-   */
-  setMerchantKey (key) {
-    this._instance.merchantKey = key
   }
 
   /**
@@ -293,17 +182,44 @@ class Invoice {
    * @param {string} memo Memo text
    * @example
    * // Memos are not supported by all wallets
-   * invoice.setMemo("Payment to YOUR_SERVICE_NAME");
+   * invoice.setMemo("Payment to YOUR_SERVICE_NAME")
    */
   setMemo (memo) {
-    this.options.memo = memo
+    this.memo = memo
     return this
   }
 
   /**
-   * Sets Private Data against the invoice.
+   * <p>Sets Merchant Data associated with invoice</p>
+   * <p><strong>This must be Base64 encoded</strong></p>
+   * @param {string} data Base64 encoded string
+   * @example
+   * // Node
+   * invoice.setMerchantData(Buffer.from('INVOICE_001', 'base64'))
    *
-   * Private data is stored under the 'options' object of an invoice and should never be exposed to the end user.
+   * // Browser
+   * invoice.setMerchantData(btoa('INVOICE_001'))
+   */
+  setMerchantData (base64) {
+    this.merchantData = base64
+    return this
+  }
+
+  /**
+   * <p>Sets the API Key</p>
+   * <p>An arbitrary API Key that can be used to later retrieve invoice information.</p>
+   * <p><small>This should never be used if the invoice is created client-side (in the browser).</small></p>
+   * @example
+   * invoice.setAPIKey('https://t.me/yourname|SECURE_STRING')
+   */
+  setAPIKey (key) {
+    this.apiKey = key
+    return this
+  }
+
+  /**
+   * <p>Sets Private Data against the invoice.</p>
+   * <p>Private data is stored under the 'options' object of an invoice and should never be exposed to the end user.</p>
    * @param {(string|object)} data If an object is passed, this will be converted to a string.
    * @example
    * // Using a string
@@ -319,7 +235,7 @@ class Invoice {
       data = JSON.stringify(data)
     }
 
-    this.options.privateData = data
+    this.privateData = data
     return this
   }
 
@@ -331,57 +247,41 @@ class Invoice {
    * invoice.setUserCurrency('AUD')
    */
   setUserCurrency (currency) {
-    this.options.userCurrency = currency
+    this.userCurrency = currency
     return this
   }
 
   /**
-   * Set Webhook
-   * @param {(Array|String)} events The type of Webhook (requested, broadcasted, etc)
+   * <p>Set Webhook</p>
+   * <p>Used to notify server endpoint of transaction event.</p>
+   * <p>Note that a JSON response can be returned by the server to modify the fields:
+   * "data" and "privateData".</p>
    * @param {String} endpoint The endpoint that should be hit
+   * @param {(Array|String)} events The type of Webhook (broadcasting, broadcasted, confirmed)
    * @example
-   * // Set single Webhook
+   * // Set Webhook (defaults to broadcasting, broadcasted and confirmed)
    * let invoice = new Invoice();
-   * invoice.setWebhook("broadcasted", 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
+   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
    *
-   * // Set multiple Webhooks
+   * // Only trigger on "broadcasting" and "broadcasted"
    * let invoice = new Invoice();
-   * invoice.setWebhook(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])
    */
-  setWebhook (events, endpoint) {
+  setWebhook (endpoint, events = ['broadcasting', 'broadcasted', 'confirmed']) {
     if (typeof events === 'string') {
       events = [events]
     }
 
-    events.forEach(event => { this.options.webhooks[event] = endpoint })
+    events.forEach(event => {
+      this.webhook[event] = endpoint
+    })
 
     return this
   }
 
   /**
-   * Make this invoice a static invoice
-   * @param {object} [opts={}] Options for static invoice
-   * @example
-   * // Infinite re-use, no expiration
-   * invoice.staticInvoice()
-   *
-   * // Re=usable ten times, valid until end of 2020
-   * invoice.staticInvoice({
-   *   quantity: 10,
-   *   validUntil: "2020-12-31T01:00:00.992Z"
-   * })
-   */
-  staticInvoice (opts) {
-    this.options.behavior = 'static'
-    this.options.static = opts
-
-    return this
-  }
-
-  /**
-   * Create the invoice.
-   *
-   * If "id" does not exist on invoice, a new Invoice will be requested from the CashPayServer.
+   * <p>Create the invoice.</p>
+   * <p>If "id" does not exist on invoice, a new Invoice will be requested from the CashPayServer.</p>
    * @param {DOMElement} [container] DOM Element to render CashPay in
    * @param {Object} [options] Options for container rendering
    * @example
@@ -406,16 +306,14 @@ class Invoice {
     }
 
     try {
-      if (!this.id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', this.options)
+      if (!this._id) {
+        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', _.omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
       if (this._instance.listen) {
         // Setup expiration timer
-        if (this.details.behavior === 'normal') {
-          this._setupExpirationTimer()
-        }
+        this._setupExpirationTimer()
 
         // Setup event listener for expired and broadcasted to stop Websocket listener
         this.on(['expired', 'broadcasted'], (secondsRemaining) => {
@@ -437,9 +335,8 @@ class Invoice {
   }
 
   /**
-   * Get the payload of the invoice.
-   *
-   * This function can be used to pass the invoice back to the browser from the server-side.
+   * <p>Get the payload of the invoice.</p>
+   * <p>This function can be used to pass the invoice back to the browser from the server-side.</p>
    * @param {boolean} [publicOnly=true] Only return properties that should be visible to the end user (hide private options)
    * @example
    * // Get JSON payload
@@ -496,7 +393,7 @@ class Invoice {
    */
   _setupExpirationTimer () {
     this._instance.expiryTimer = setInterval(() => {
-      const expires = new Date(this.details.expires * 1000).getTime()
+      const expires = new Date(this.expires * 1000).getTime()
       const now = new Date().getTime()
       const secondsRemaining = Math.round((expires - now) / 1000)
 
@@ -513,7 +410,7 @@ class Invoice {
    */
   _setupContainer (container, options) {
     options = Object.assign({
-      color: '#14244c',
+      color: '#000',
       scale: 12,
       margin: 0,
       template: template,
@@ -533,6 +430,7 @@ class Invoice {
 
     // Find container elements
     const subContainerEl = container.querySelector('.cashpay-container')
+    const qrCodeLinkEl = container.querySelector('.cashpay-qr-code-link')
     const qrCodeEl = container.querySelector('.cashpay-qr-code')
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
@@ -551,13 +449,14 @@ class Invoice {
         margin: options.margin
       })
 
-      // Set totals for BCH and Fiat
-      totalFiatEl.innerText = `${this.details.meta.userCurrencyTotal}${this.details.meta.userCurrency}`
+      // Set link on QR Code
+      qrCodeLinkEl.href = this.service.walletURI
 
-      // Only show in BCH if this is not a static invoice
-      if (this.details.behavior === 'normal') {
-        totalBCHEl.innerText = `${this.details.meta.satoshiTotal / 100000000}BCH`
-      }
+      // Set totals for BCH and Fiat
+      totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
+
+      // Show value in BCH
+      totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
 
       // Set the button text and url
       buttonEl.innerText = options.lang.openInWallet
@@ -572,18 +471,10 @@ class Invoice {
       buttonEl.innerText = options.lang.paymentReceived
       buttonEl.classList.add('animate__pulse')
 
-      // If this is a static invoice
-      if (this.details.behavior === 'static') {
-        setTimeout(() => {
-          buttonEl.innerText = options.lang.openInWallet
-          buttonEl.classList.remove('animate__pulse')
-        }, 5000)
-      } else { // Otherwise...
-        qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
-        qrCodeEl.classList.add('animate__pulse')
-        buttonEl.removeAttribute('href')
-        expiresEl.innerText = ''
-      }
+      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
+      qrCodeEl.classList.add('animate__pulse')
+      buttonEl.removeAttribute('href')
+      expiresEl.innerText = ''
     })
 
     // Trigger on invoice expiry

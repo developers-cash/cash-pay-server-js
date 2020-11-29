@@ -1,7 +1,7 @@
 
 # Cash-Pay-Server-JS
 
-Javascript library for use with Cash Pay Servers.
+Javascript/Node library for use with Cash Pay Servers.
 
 ## Usage
 
@@ -20,7 +20,7 @@ npm install @developers.cash/cash-pay-server-js --save
 Create an invoice on your server-side:
 
 ```javascript
-const CashPay = require('cash-pay-server-js')
+const CashPay = require('@developers-cash/cash-pay-server-js')
 
 // ...
 
@@ -28,7 +28,7 @@ const CashPay = require('cash-pay-server-js')
 let invoice = new CashPay.Invoice()
   .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
   .setPrivateData({ invoiceId: 'ABC123' })
-  .setWebhook(['broadcasting', 'broadcasted'], 'https://webhook.site/63295fd3-132c-45ac-a198-d26e1abdef19')
+  .setWebhook('https://webhook.site/63295fd3-132c-45ac-a198-d26e1abdef19')
 await invoice.create()
 
 // Return payload to client-side
@@ -59,7 +59,7 @@ const CashPay = require('cash-pay-server-js')
 
 // Add the CashPayServer you're using as trusted
 let webhook = new CashPay.Webhook()
-await webhook.addTrusted('https://pay.infra.cash')
+await webhook.addTrusted('https://v1.pay.infra.cash')
 
 //
 // HTTP POST /webhook endpoint

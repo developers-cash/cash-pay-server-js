@@ -13,7 +13,7 @@
   .cashpay-details {
     margin-bottom: 1em;
     overflow: auto;
-    font-size: 1.2em;
+    font-size: 1.0em;
     color: #666;
     font-weight: 600;
   }
@@ -30,9 +30,9 @@
     display: block;
     clear: both;
     text-align: center;
-    background: #14244c;
+    background: #000;
     color: #fff;
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-weight: 600;
     border-radius: 10px;
     padding: 0.5em;
@@ -54,14 +54,16 @@
 
 <div class="cashpay-container animate__animated animate__fadeIn">
   <div class="cashpay-qr-code-container">
-    <img class="cashpay-qr-code animate__animated" />
+    <a class="cashpay-qr-code-link" title="Click to open in wallet">
+      <img class="cashpay-qr-code animate__animated" />
+    </a>
   </div>
   <div class="cashpay-below">
     <div class="cashpay-details">
       <div class="cashpay-total-bch"></div>
       <div class="cashpay-total-fiat"></div>
     </div>
-    <a class="cashpay-button animate__animated"></a>
+    <!--<a class="cashpay-button animate__animated"></a>-->
     <div class="cashpay-expires"></div>
   </div>
 </div>
