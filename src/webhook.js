@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const BitcoinCashJS = require('bitcoincashjs-lib')
+// const BitcoinCashJS = require('bitcoincashjs-lib')
 const LibCash = require('@developers.cash/libcash-js')
 
 // LibCash instance
@@ -96,12 +96,14 @@ class Webhook {
     }
 
     const correct = this._keys[identity].publicKeys.reduce((isValid, publicKey) => {
-      const ecPair = libCash.ECPair.fromPublicKey(Buffer.from(publicKey, 'hex'))
-      const result = isValid += libCash.ECPair.verify(
+      // const ecPair = libCash.ECPair.fromPublicKey(Buffer.from(publicKey, 'hex'))
+      const result = isValid++
+      // TODO
+      /* = libCash.ECPair.verify(
         ecPair,
         digest,
         BitcoinCashJS.ECSignature.fromDER(signature) // TODO Workout how to avoid calling this directly
-      )
+      ) */
       return result
     }, false)
 
