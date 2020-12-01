@@ -404,6 +404,8 @@ class Invoice {
   _setupContainer (container, options) {
     options = Object.assign({
       color: '#000',
+      tickColor: '#000',
+      crossColor: '#000',
       scale: 12,
       margin: 0,
       template: template,
@@ -464,7 +466,7 @@ class Invoice {
       buttonEl.innerText = options.lang.paymentReceived
       buttonEl.classList.add('animate__pulse')
 
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
+      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.tickColor))}`
       qrCodeEl.classList.add('animate__pulse')
       buttonEl.removeAttribute('href')
       expiresEl.innerText = ''
@@ -472,7 +474,7 @@ class Invoice {
 
     // Trigger on invoice expiry
     this.on('expired', () => {
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`
+      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.crossColor))}`
       qrCodeEl.classList.add('animate__pulse')
       buttonEl.removeAttribute('href')
       buttonEl.innerText = options.lang.expired
