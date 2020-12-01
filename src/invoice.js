@@ -456,7 +456,7 @@ class Invoice {
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      subContainerEl.classList.add("broadcasted")
+      subContainerEl.classList.add('broadcasted')
       qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.tickColor))}`
       qrCodeEl.classList.add('animate__pulse')
       qrCodeLinkEl.removeAttribute('href')
@@ -465,7 +465,7 @@ class Invoice {
 
     // Trigger on invoice expiry
     this.on('expired', () => {
-      subContainerEl.classList.add("expired")
+      subContainerEl.classList.add('expired')
       qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.crossColor))}`
       qrCodeEl.classList.add('animate__pulse')
       qrCodeLinkEl.removeAttribute('href')
