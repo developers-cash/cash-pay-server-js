@@ -347,6 +347,19 @@ class Invoice {
   }
 
   /**
+   * <p>Destroy the invoice instance.</p>
+   * <p>This function should be used to clear all listeners from the invoice.</p>
+   * <p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
+   * @example
+   * // Destroy the invoice to prevent memory-leaks/dangling references
+   * invoice.destroy()
+   */
+  async destroy () {
+    this._instance.socket.disconnect()
+    clearInterval(this._instance.expiryTimer)
+  }
+
+  /**
    * @private
    * Setup WebSocket listener.
    * This should not need to be called manually
