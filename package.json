@@ -1,6 +1,6 @@
 {
   "name": "@developers.cash/cash-pay-server-js",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "A Client-side and Server-side library for integrating with Cash Pay Microservice instances.",
   "main": "lib/index.js",
   "files": [
