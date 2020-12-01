@@ -410,11 +410,9 @@ class Invoice {
       margin: 0,
       template: template,
       lang: {
-        openInWallet: 'Open in Wallet',
         expiresIn: 'Expires in ',
         invoiceHasExpired: 'Invoice has expired',
-        expired: 'Expired',
-        paymentReceived: 'Payment received'
+        expired: 'Expired'
       }
     }, options)
 
@@ -430,7 +428,6 @@ class Invoice {
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
-    const buttonEl = container.querySelector('.cashpay-button')
     const errorEl = container.querySelector('.cashpay-error')
 
     // Trigger on invoice creation...
@@ -453,32 +450,25 @@ class Invoice {
       // Show value in BCH
       totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
 
-      // Set the button text and url
-      buttonEl.innerText = options.lang.openInWallet
-      buttonEl.href = this.service.walletURI
-
       // Show the subcontainer
       subContainerEl.style.display = 'block'
     })
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      buttonEl.innerText = options.lang.paymentReceived
-      buttonEl.classList.add('animate__pulse')
-
+      subContainerEl.classList.add("broadcasted")
       qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.tickColor))}`
       qrCodeEl.classList.add('animate__pulse')
-      buttonEl.removeAttribute('href')
+      qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = ''
     })
 
     // Trigger on invoice expiry
     this.on('expired', () => {
+      subContainerEl.classList.add("expired")
       qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.crossColor))}`
       qrCodeEl.classList.add('animate__pulse')
-      buttonEl.removeAttribute('href')
-      buttonEl.innerText = options.lang.expired
-      buttonEl.classList.add('animate__pulse')
+      qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = options.lang.invoiceHasExpired
     })
 

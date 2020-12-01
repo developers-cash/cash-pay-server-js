@@ -4,13 +4,20 @@
     margin-bottom: 1em;
   }
 
-  .cashpay-qr-code {
+  .cashpay-container .cashpay-qr-code {
     width: 100%;
     max-width: 100%;
     margin-bottom: 1em;
+    border: 2px dashed #000;
+    padding: 0.5em;
   }
   
-  .cashpay-details {
+  .cashpay-container.expired .cashpay-qr-code, .cashpay-container.broadcasted .cashpay-qr-code {
+    border: none;
+    padding: 0;
+  }
+  
+  .cashpay-container .cashpay-details {
     margin-bottom: 1em;
     overflow: auto;
     font-size: 1.0em;
@@ -18,34 +25,20 @@
     font-weight: 600;
   }
 
-  .cashpay-total-bch {
+  .cashpay-container .cashpay-total-bch {
     float: left;
   }
   
-  .cashpay-total-fiat {
+  .cashpay-container .cashpay-total-fiat {
     float: right;
   }
   
-  a.cashpay-button {
-    display: block;
-    clear: both;
-    text-align: center;
-    background: #000;
-    color: #fff;
-    font-size: 1.25em;
-    font-weight: 600;
-    border-radius: 10px;
-    padding: 0.5em;
-    text-decoration: none;
-    margin-bottom: 0.5em;
-  }
-  
-  .cashpay-expires {
+  .cashpay-container .cashpay-expires {
     text-align: center;
     margin-bottom: 0.5em;
   }
   
-  .cashpay-error {
+  .cashpay-container .cashpay-error {
     color: #bb0101;
     font-weight: bold;
     text-align: center;
@@ -63,7 +56,6 @@
       <div class="cashpay-total-bch"></div>
       <div class="cashpay-total-fiat"></div>
     </div>
-    <a class="cashpay-button animate__animated"></a>
     <div class="cashpay-expires"></div>
   </div>
 </div>
