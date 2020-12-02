@@ -1,9 +1,11 @@
 
 # Cash-Pay-Server-JS
 
-Javascript/Node library for use with Cash Pay Servers.
+Javascript/Node library for use with Cash Pay Server.
 
-## Usage
+Documentation: [https://developers-cash.github.io/cash-pay-server-js/](https://developers-cash.github.io/cash-pay-server-js/)
+
+## Quick Start
 
 Include the `cash-pay-server-js` NPM package in your project.
 
@@ -17,60 +19,166 @@ npm install @developers.cash/cash-pay-server-js --save
 <script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
 ```
 
-Create an invoice on your server-side:
+Server-side Code for creating and marking as paid:
 
 ```javascript
 const CashPay = require('@developers-cash/cash-pay-server-js')
 
 // ...
 
-// Create invoice
-let invoice = new CashPay.Invoice()
-  .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
-  .setPrivateData({ invoiceId: 'ABC123' })
-  .setWebhook('https://webhook.site/63295fd3-132c-45ac-a198-d26e1abdef19')
-await invoice.create()
+// Create invoice 
+async function requestInvoice(req, res) {
+  try {
+    // Do things - get list of items in order, etc
 
-// Return payload to client-side
-return invoice.payload()
+    // Create the invoice
+    let invoice = new CashPay.Invoice()
+      .setAPIKey('someRandomString') // Optional (but allows use of Admin Interface)
+      .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
+    await invoice.create()
+    
+    // Save invoiceId to database, etc
+    // const invoiceId = invoice.id
+
+    // Return payload to client-side (ExpressJS Example)
+    return res.send(invoice.payload())
+  } catch (err) {
+    return res.send(err)
+  }
+}
+
+// Mark invoice as paid
+async function invoicePaid(req, res) {
+  try {
+    // Verify signature of event (to prevent spoofing)
+    await CashPay.Signatures.verifyEvent(req.body.event)
+    
+    // Do things - mark as paid in database, etc
+    if (req.body.event.event === 'broadcasted') {
+      // const invoiceId = event.invoice.id
+    }
+    
+    return res.send({ status: 'ok' })
+  } catch (err) {
+    return res.send(err)
+  }
+}
 ```
 
 Render the created invoice on your client-side
 
-```javascript
-// Request invoice from server endpoint
-let invoice = await CashPay.Invoice.fromServerEndpoint('./request-invoice', {
-  // Params to pass to server-side
-})
+```html
+<!-- head -->
+<script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
+<!-- Or install via NPM -->
 
-invoice.on(['broadcasting', 'broadcasted'], e => {
-  // Do something when invoice has been paid paid
-  console.log(e)
-})
+<!-- body -->
+<div id="invoice-container"></div>
 
-// Render the default Invoice UI in a HTML container
-await invoice.create(document.getElementById('invoice-container'))
+<script>
+async function fetchInvoice() {
+  // Request invoice from server endpoint
+  let invoice = await CashPay.Invoice.fromServerEndpoint('https://api.yoursite.com/request-invoice', {
+    // Optional POST params to pass to server-side
+    // items: [ ... ]
+  })
+
+  // Setup event listener for broadcasted event
+  invoice.on(['broadcasted'], e => {
+    axios.post('https://api.yoursite.com/invoice-paid', {
+      event: e
+    })
+    
+    invoice.destroy()
+  })
+
+  // Render the default Invoice UI in a HTML container
+  await invoice.create(document.getElementById('invoice-container'))
+}
+
+fetchInvoice()
+</script>
 ```
 
-If you need to mark the invoice as paid in your backend database (or similar), setup a Webhook endpoint:
+The default template uses inline SVG's and can be styled using CSS:
 
-```javascript
-const CashPay = require('cash-pay-server-js')
+```css
+#invoice-container {
+  margin: auto;
+  max-width: 150px;
+  font-size: 0.8em;
+}
 
-// Add the CashPayServer you're using as trusted
-let webhook = new CashPay.Webhook()
-await webhook.addTrusted('https://v1.pay.infra.cash')
+#invoice-container .cashpay-tick {
+  fill: #00c58a !important;
+}
 
-//
-// HTTP POST /webhook endpoint
-//
-await webhook.verifySignature(req.body, req.headers)
-
-// Save to server (or similar)
-console.log(req.body)
+#invoice-container .cashpay-cross {
+  fill: #F00 !important;
+}
 ```
 
-For more in-depth guides, see the following resources:
+## Webhooks
 
-[Guides](https://github.com/developers-cash/cash-pay-server-resources/tree/master/guide)
-[Javascript API](https://github.com/developers-cash/cash-pay-server-resources/blob/master/api/cash-pay-server-js.md)
+Webhooks are also available.
+
+```javascript
+async function requestInvoice(req, res) {
+  // ...
+  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['confirmed'])
+  // ...
+}
+
+async function webhookEndpoint(req, res) {
+  try {
+    await CashPay.Signatures.verifyWebhook(req.body, req.headers)
+    
+    // Do things - mark as confirmed, etc
+    
+    // If a JSON response is given, you can modify "data" and "privateData" on the invoice
+    res.send({
+      data: "SomeData",
+      privateData: "SomeOtherData"
+    })
+  } catch (err) {
+    return res.send(err)
+  }
+}
+```
+
+Webhooks that do not give a 200 status code are considered failures.
+
+## Using a difference CashPayServer Instance
+
+See documentation about [Self-Hosting](https://developers-cash.github.io/cash-pay-server-js/).
+
+```javascript
+const CashPay = require('@developers-cash/cash-pay-server-js')
+
+CashPay.config.options.endpoint = 'https://pay.your-instance.com'
+```
+
+## Creating an Invoice Client-Side
+
+Invoices can also be created directly in the browser.
+
+```html
+<!-- head -->
+<script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
+
+<!-- body -->
+<div id="invoice-container"></div>
+
+<script>
+// Create the invoice
+async function createInvoice() {
+  let invoice = new CashPay.Invoice()
+    .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
+  await invoice.create(document.getElementById('invoice-container'))
+}
+
+createInvoice()
+</script>
+```
+
+Note that creating the invoice in the browser is insecure for most use-cases.

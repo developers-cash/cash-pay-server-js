@@ -45,6 +45,10 @@ const cross = require('../statics/cross.svg')
   *   console.log(event)
   * })
   * invoice.create(document.getElementById('invoice-container'))
+  *
+  * // When you're done with invoice on client-side, it's important to call destroy.
+  * // Otherwise, you may end up with memory-leaks.
+  * invoice.destroy()
   */
 class Invoice {
   constructor (opts = {}, invoice = {}) {
@@ -170,7 +174,7 @@ class Invoice {
    * @param {number} seconds Seconds from time of creation that Payment Request expires
    * @example
    * // 15 minutes
-   * invoice.setExpiration(15 * 60)
+   * invoice.setExpires(15 * 60)
    */
   setExpires (seconds) {
     this.expires = seconds
@@ -307,7 +311,7 @@ class Invoice {
 
     try {
       if (!this._id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', _.omit(this, '_instance'))
+        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
@@ -416,11 +420,6 @@ class Invoice {
    */
   _setupContainer (container, options) {
     options = Object.assign({
-      color: '#000',
-      tickColor: '#000',
-      crossColor: '#000',
-      scale: 12,
-      margin: 0,
       template: template,
       lang: {
         expiresIn: 'Expires in ',
@@ -446,12 +445,9 @@ class Invoice {
     // Trigger on invoice creation...
     this.on('created', async () => {
       // Render QR Code
-      qrCodeEl.src = await QRCode.toDataURL(this.service.walletURI, {
-        color: {
-          dark: options.color
-        },
-        scale: options.scale,
-        margin: options.margin
+      qrCodeEl.innerHTML = await QRCode.toString(this.service.walletURI, {
+        type: 'svg',
+        margin: 0
       })
 
       // Set link on QR Code
@@ -470,7 +466,7 @@ class Invoice {
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
       subContainerEl.classList.add('broadcasted')
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.tickColor))}`
+      qrCodeEl.innerHTML = tick
       qrCodeEl.classList.add('animate__pulse')
       qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = ''
@@ -479,7 +475,7 @@ class Invoice {
     // Trigger on invoice expiry
     this.on('expired', () => {
       subContainerEl.classList.add('expired')
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.crossColor))}`
+      qrCodeEl.innerHTML = cross
       qrCodeEl.classList.add('animate__pulse')
       qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = options.lang.invoiceHasExpired

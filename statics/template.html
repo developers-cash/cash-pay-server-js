@@ -12,6 +12,10 @@
     padding: 0.5em;
   }
   
+  .cashpay-container .cashpay-qr-code svg {
+    display: block;
+  }
+  
   .cashpay-container.expired .cashpay-qr-code, .cashpay-container.broadcasted .cashpay-qr-code {
     border: none;
     padding: 0;
@@ -48,7 +52,7 @@
 <div class="cashpay-container animate__animated animate__fadeIn">
   <div class="cashpay-qr-code-container">
     <a class="cashpay-qr-code-link" title="Click to open in wallet">
-      <img class="cashpay-qr-code animate__animated" />
+      <div class="cashpay-qr-code animate__animated"></div>
     </a>
   </div>
   <div class="cashpay-below">

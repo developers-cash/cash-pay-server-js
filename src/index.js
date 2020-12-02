@@ -1,9 +1,9 @@
 const config = require('./config')
 const Invoice = require('./invoice')
-const Webhook = require('./webhook')
+const Signatures = require('./signatures')
 
 module.exports = {
   config: config,
   Invoice: Invoice,
-  Webhook: Webhook
+  Signatures: Signatures
 }
