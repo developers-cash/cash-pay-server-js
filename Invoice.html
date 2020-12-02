@@ -21,7 +21,7 @@
     <div class="logo" style="">
         
             <a href="https://infra.cash" rel="noopener noreferrer" target="_blank">
-                <img src="/logo.svg" width="100%" height="100%">
+                <img src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" width="100%" height="100%">
             </a>
         
     </div>
@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Webhook.html">Webhook</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Webhook_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Webhook.html#addTrusted">addTrusted</a></li><li><a href="Webhook.html#verifySignature">verifySignature</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -51,9 +51,13 @@
         <h2><span class="attribs"><span class="type-signature"></span></span>Invoice<span class="signature">(opts, invoice)</span><span class="type-signature"></span></h2>
         
             <div class="class-description"><p>A Cash Payment Server Invoice</p>
-<p><small>Any field that is prefixed with an underscore is private and should
-never be accessed directly.</small></p>
-<p><small>Any field that is not prefixed by an underscore is considered public
+<p>Invoices can be created client-side or server-side. However, for security
+reasons, it is recommended that invoices are created server-side and passed
+back to the client-side.</p>
+<p><small><strong>Note:</strong> Any field that is prefixed with an underscore
+is private and should never be accessed directly.</small></p>
+<p><small><strong>Note:</strong> Any field that is not prefixed by an
+underscore is considered public
 and stable (hence there are no "getter" functions in this class).
 Only use setters to modify the parameters of an invoice - do not set
 values directly.</small></p></div>
@@ -76,7 +80,7 @@ values directly.</small></p></div>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line45">line 45</a></code>
+                <code><a href="invoice.js.html#line53">line 53</a></code>
             </div>
             
         </h4>
@@ -227,7 +231,7 @@ values directly.</small></p></div>
 let invoice = new CashPay.Invoice()
   .setMerchantKey('your.site|SECURE_KEY_123')
   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-  .setWebhooks(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+  .setWebhooks(['https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
 await invoice.create()
 
 // Send Payload JSON to browser
@@ -240,7 +244,11 @@ let invoice = await CashPay.Invoice.fromServerEndpoint('your-endpoint-above')
 invoice.on(['broadcasting', 'broadcasted'], (event) {
   console.log(event)
 })
-invoice.create(document.getElementById('invoice-container'))</code></pre>
+invoice.create(document.getElementById('invoice-container'))
+
+// When you're done with invoice on client-side, it's important to call destroy.
+// Otherwise, you may end up with memory-leaks.
+invoice.destroy()</code></pre>
 
     
 
@@ -279,7 +287,7 @@ invoice.create(document.getElementById('invoice-container'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line62">line 62</a></code>
+                <code><a href="invoice.js.html#line70">line 70</a></code>
             </div>
             
         </h4>
@@ -448,7 +456,7 @@ await invoice.create(document.getElementById('invoice-container'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line83">line 83</a></code>
+                <code><a href="invoice.js.html#line91">line 91</a></code>
             </div>
             
         </h4>
@@ -643,7 +651,7 @@ await invoice.create(document.getElementById('invoice-container'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line137">line 137</a></code>
+                <code><a href="invoice.js.html#line145">line 145</a></code>
             </div>
             
         </h4>
@@ -817,7 +825,7 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line155">line 155</a></code>
+                <code><a href="invoice.js.html#line163">line 163</a></code>
             </div>
             
         </h4>
@@ -1018,7 +1026,7 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line297">line 297</a></code>
+                <code><a href="invoice.js.html#line307">line 307</a></code>
             </div>
             
         </h4>
@@ -1214,6 +1222,103 @@ await invoice.create();</code></pre>
 
 <dt>
     
+        <h4 class="name" id="destroy">
+            
+                <span class="type-signature"><span class="icon green">async</span> </span>destroy<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line361">line 361</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Destroy the invoice instance.</p>
+<p>This function should be used to clear all listeners from the invoice.</p>
+<p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// Destroy the invoice to prevent memory-leaks/dangling references
+invoice.destroy()</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
         <h4 class="name" id="on">
             
                 <span class="type-signature"></span>on<span class="signature">(events, callback)</span><span class="type-signature"></span>
@@ -1221,7 +1326,7 @@ await invoice.create();</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line116">line 116</a></code>
+                <code><a href="invoice.js.html#line124">line 124</a></code>
             </div>
             
         </h4>
@@ -1402,12 +1507,12 @@ let invoice = new CashPay.Invoice()
     
         <h4 class="name" id="payload">
             
-                <span class="type-signature"></span>payload<span class="signature">(publicOnly<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                <span class="type-signature"></span>payload<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line342">line 342</a></code>
+                <code><a href="invoice.js.html#line349">line 349</a></code>
             </div>
             
         </h4>
@@ -1421,6 +1526,7 @@ let invoice = new CashPay.Invoice()
     <div class="description">
         <p>Get the payload of the invoice.</p>
 <p>This function can be used to pass the invoice back to the browser from the server-side.</p>
+<p><small>The fields [apiKey, privateData, webhook, events] will be omitted from the payload</small></p>
     </div>
     
 
@@ -1430,76 +1536,6 @@ let invoice = new CashPay.Invoice()
 
     
 
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>publicOnly</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">Only return properties that should be visible to the end user (hide private options)</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
     
 
     
@@ -1555,10 +1591,7 @@ let invoice = new CashPay.Invoice()
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>// Get JSON payload
-let payload = invoice.getPayload()
-
-// Get FULL JSON payload (security risk!)
-let payload = invoice.getPayload(true)</code></pre>
+let payload = invoice.getPayload()</code></pre>
 
     
 
@@ -1576,7 +1609,7 @@ let payload = invoice.getPayload(true)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line212">line 212</a></code>
+                <code><a href="invoice.js.html#line219">line 219</a></code>
             </div>
             
         </h4>
@@ -1589,9 +1622,8 @@ let payload = invoice.getPayload(true)</code></pre>
     
     <div class="description">
         <p>Sets the API Key</p>
-<p>If a Merchant sets this key, it gives them elevated access to an invoice meaning they
-can use this later to retrieve a list of invoices (with this key set) that failed and
-manually re-trigger the sending of Webhooks.</p>
+<p>An arbitrary API Key that can be used to later retrieve invoice information.</p>
+<p><small>This should never be used if the invoice is created client-side (in the browser).</small></p>
     </div>
     
 
@@ -1673,7 +1705,7 @@ manually re-trigger the sending of Webhooks.</p>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line171">line 171</a></code>
+                <code><a href="invoice.js.html#line179">line 179</a></code>
             </div>
             
         </h4>
@@ -1800,7 +1832,7 @@ manually re-trigger the sending of Webhooks.</p>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>// 15 minutes
-invoice.setExpiration(15 * 60)</code></pre>
+invoice.setExpires(15 * 60)</code></pre>
 
     
 
@@ -1818,7 +1850,7 @@ invoice.setExpiration(15 * 60)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line183">line 183</a></code>
+                <code><a href="invoice.js.html#line191">line 191</a></code>
             </div>
             
         </h4>
@@ -1963,7 +1995,7 @@ invoice.setMemo("Payment to YOUR_SERVICE_NAME")</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line199">line 199</a></code>
+                <code><a href="invoice.js.html#line207">line 207</a></code>
             </div>
             
         </h4>
@@ -2112,7 +2144,7 @@ invoice.setMerchantData(btoa('INVOICE_001'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line230">line 230</a></code>
+                <code><a href="invoice.js.html#line237">line 237</a></code>
             </div>
             
         </h4>
@@ -2266,7 +2298,7 @@ invoice.setPrivateData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line246">line 246</a></code>
+                <code><a href="invoice.js.html#line253">line 253</a></code>
             </div>
             
         </h4>
@@ -2406,12 +2438,12 @@ invoice.setUserCurrency('AUD')</code></pre>
     
         <h4 class="name" id="setWebhook">
             
-                <span class="type-signature"></span>setWebhook<span class="signature">(events, endpoint)</span><span class="type-signature"></span>
+                <span class="type-signature"></span>setWebhook<span class="signature">(endpoint, events)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line264">line 264</a></code>
+                <code><a href="invoice.js.html#line274">line 274</a></code>
             </div>
             
         </h4>
@@ -2423,7 +2455,10 @@ invoice.setUserCurrency('AUD')</code></pre>
 
     
     <div class="description">
-        Set Webhook
+        <p>Set Webhook</p>
+<p>Used to notify server endpoint of transaction event.</p>
+<p>Note that a JSON response can be returned by the server to modify the fields:
+"data" and "privateData".</p>
     </div>
     
 
@@ -2459,6 +2494,29 @@ invoice.setUserCurrency('AUD')</code></pre>
 
         <tr>
             
+                <td class="name"><code>endpoint</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The endpoint that should be hit</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>events</code></td>
             
 
@@ -2478,30 +2536,7 @@ invoice.setUserCurrency('AUD')</code></pre>
 
             
 
-            <td class="description last">The type of Webhook (requested, broadcasted, etc)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>endpoint</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The endpoint that should be hit</td>
+            <td class="description last">The type of Webhook (broadcasting, broadcasted, confirmed)</td>
         </tr>
 
     
@@ -2563,13 +2598,13 @@ invoice.setUserCurrency('AUD')</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// Set single Webhook
+    <pre class="prettyprint"><code>// Set Webhook (defaults to broadcasting, broadcasted and confirmed)
 let invoice = new Invoice();
-invoice.setWebhook("broadcasted", 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
+invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
 
-// Set multiple Webhooks
+// Only trigger on "broadcasting" and "broadcasted"
 let invoice = new Invoice();
-invoice.setWebhook(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')</code></pre>
+invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])</code></pre>
 
     
 
@@ -2591,7 +2626,7 @@ invoice.setWebhook(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhoo
 </div>
 
 <footer>
-    <img class="logo" src="/logo.svg" style="">
+    <img class="logo" src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" style="">
     <div class="footer-text"><a href="https://infra.cash">https://infra.cash</a></div>
 </footer>
 <script>prettyPrint();</script>

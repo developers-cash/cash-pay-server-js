@@ -21,7 +21,7 @@
     <div class="logo" style="">
         
             <a href="https://infra.cash" rel="noopener noreferrer" target="_blank">
-                <img src="/logo.svg" width="100%" height="100%">
+                <img src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" width="100%" height="100%">
             </a>
         
     </div>
@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Webhook.html">Webhook</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Webhook_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Webhook.html#addTrusted">addTrusted</a></li><li><a href="Webhook.html#verifySignature">verifySignature</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -56,6 +56,160 @@
     
 
 
+    <section>
+        <article class="readme"><h1>Cash-Pay-Server-JS</h1>
+<p>Javascript/Node library for use with Cash Pay Server.</p>
+<p>Documentation: <a href="https://developers-cash.github.io/cash-pay-server-js/">https://developers-cash.github.io/cash-pay-server-js/</a></p>
+<h2>Quick Start</h2>
+<p>Include the <code>cash-pay-server-js</code> NPM package in your project.</p>
+<pre class="prettyprint source lang-bash"><code>npm install @developers.cash/cash-pay-server-js --save
+</code></pre>
+<p>... or alternatively, load it from a CDN:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
+</code></pre>
+<p>Server-side Code for creating and marking as paid:</p>
+<pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers-cash/cash-pay-server-js')
+
+// ...
+
+// Create invoice 
+async function requestInvoice(req, res) {
+  try {
+    // Do things - get list of items in order, etc
+
+    // Create the invoice
+    let invoice = new CashPay.Invoice()
+      .setAPIKey('someRandomString') // Optional (but allows use of Admin Interface)
+      .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', &quot;0.25USD&quot;)
+    await invoice.create()
+    
+    // Save invoiceId to database, etc
+    // const invoiceId = invoice.id
+
+    // Return payload to client-side (ExpressJS Example)
+    return res.send(invoice.payload())
+  } catch (err) {
+    return res.send(err)
+  }
+}
+
+// Mark invoice as paid
+async function invoicePaid(req, res) {
+  try {
+    // Verify signature of event (to prevent spoofing)
+    await CashPay.Signatures.verifyEvent(req.body.event)
+    
+    // Do things - mark as paid in database, etc
+    if (req.body.event.event === 'broadcasted') {
+      // const invoiceId = event.invoice.id
+    }
+    
+    return res.send({ status: 'ok' })
+  } catch (err) {
+    return res.send(err)
+  }
+}
+</code></pre>
+<p>Render the created invoice on your client-side</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- head -->
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
+&lt;!-- Or install via NPM -->
+
+&lt;!-- body -->
+&lt;div id=&quot;invoice-container&quot;>&lt;/div>
+
+&lt;script>
+async function fetchInvoice() {
+  // Request invoice from server endpoint
+  let invoice = await CashPay.Invoice.fromServerEndpoint('https://api.yoursite.com/request-invoice', {
+    // Optional POST params to pass to server-side
+    // items: [ ... ]
+  })
+
+  // Setup event listener for broadcasted event
+  invoice.on(['broadcasted'], e => {
+    axios.post('https://api.yoursite.com/invoice-paid', {
+      event: e
+    })
+    
+    invoice.destroy()
+  })
+
+  // Render the default Invoice UI in a HTML container
+  await invoice.create(document.getElementById('invoice-container'))
+}
+
+fetchInvoice()
+&lt;/script>
+</code></pre>
+<p>The default template uses inline SVG's and can be styled using CSS:</p>
+<pre class="prettyprint source lang-css"><code>#invoice-container {
+  margin: auto;
+  max-width: 150px;
+  font-size: 0.8em;
+}
+
+#invoice-container .cashpay-tick {
+  fill: #00c58a !important;
+}
+
+#invoice-container .cashpay-cross {
+  fill: #F00 !important;
+}
+</code></pre>
+<h2>Webhooks</h2>
+<p>Webhooks are also available.</p>
+<pre class="prettyprint source lang-javascript"><code>async function requestInvoice(req, res) {
+  // ...
+  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['confirmed'])
+  // ...
+}
+
+async function webhookEndpoint(req, res) {
+  try {
+    await CashPay.Signatures.verifyWebhook(req.body, req.headers)
+    
+    // Do things - mark as confirmed, etc
+    
+    // If a JSON response is given, you can modify &quot;data&quot; and &quot;privateData&quot; on the invoice
+    res.send({
+      data: &quot;SomeData&quot;,
+      privateData: &quot;SomeOtherData&quot;
+    })
+  } catch (err) {
+    return res.send(err)
+  }
+}
+</code></pre>
+<p>Webhooks that do not give a 200 status code are considered failures.</p>
+<h2>Using a difference CashPayServer Instance</h2>
+<p>See documentation about <a href="https://developers-cash.github.io/cash-pay-server-js/">Self-Hosting</a>.</p>
+<pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers-cash/cash-pay-server-js')
+
+CashPay.config.options.endpoint = 'https://pay.your-instance.com'
+</code></pre>
+<h2>Creating an Invoice Client-Side</h2>
+<p>Invoices can also be created directly in the browser.</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- head -->
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
+
+&lt;!-- body -->
+&lt;div id=&quot;invoice-container&quot;>&lt;/div>
+
+&lt;script>
+// Create the invoice
+async function createInvoice() {
+  let invoice = new CashPay.Invoice()
+    .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', &quot;0.25USD&quot;)
+  await invoice.create(document.getElementById('invoice-container'))
+}
+
+createInvoice()
+&lt;/script>
+</code></pre>
+<p>Note that creating the invoice in the browser is insecure for most use-cases.</p></article>
+    </section>
+
 
 
 
@@ -64,7 +218,7 @@
 </div>
 
 <footer>
-    <img class="logo" src="/logo.svg" style="">
+    <img class="logo" src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" style="">
     <div class="footer-text"><a href="https://infra.cash">https://infra.cash</a></div>
 </footer>
 <script>prettyPrint();</script>

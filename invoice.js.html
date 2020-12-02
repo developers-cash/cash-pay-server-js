@@ -23,7 +23,7 @@
     <div class="logo" style="">
         
             <a href="https://infra.cash" rel="noopener noreferrer" target="_blank">
-                <img src="/logo.svg" width="100%" height="100%">
+                <img src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" width="100%" height="100%">
             </a>
         
     </div>
@@ -36,7 +36,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Webhook.html">Webhook</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Webhook_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Webhook.html#addTrusted">addTrusted</a></li><li><a href="Webhook.html#verifySignature">verifySignature</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -61,13 +61,17 @@ const cross = require('../statics/cross.svg')
 
 /**
   * &lt;p>A Cash Payment Server Invoice&lt;/p>
-  * &lt;p>&lt;small>Any field that is prefixed with an underscore is private and should
-  * never be accessed directly.&lt;/small>&lt;/p>
-  * &lt;p>&lt;small>Any field that is not prefixed by an underscore is considered public
+  * &lt;p>Invoices can be created client-side or server-side. However, for security
+  * reasons, it is recommended that invoices are created server-side and passed
+  * back to the client-side.&lt;/p>
+  * &lt;p>&lt;small>&lt;strong>Note:&lt;/strong> Any field that is prefixed with an underscore
+  * is private and should never be accessed directly.&lt;/small>&lt;/p>
+  * &lt;p>&lt;small>&lt;strong>Note:&lt;/strong> Any field that is not prefixed by an
+  * underscore is considered public
   * and stable (hence there are no "getter" functions in this class).
   * Only use setters to modify the parameters of an invoice - do not set
   * values directly.&lt;/small>&lt;/p>
-  * 
+  *
   * @param {object} opts Options for invoice instance (use setters instead)
   * @param {object} invoice Invoice properties (use setters instead)
   * @example
@@ -77,7 +81,7 @@ const cross = require('../statics/cross.svg')
   * let invoice = new CashPay.Invoice()
   *   .setMerchantKey('your.site|SECURE_KEY_123')
   *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-  *   .setWebhooks(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+  *   .setWebhooks(['https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
   * await invoice.create()
   *
   * // Send Payload JSON to browser
@@ -91,11 +95,15 @@ const cross = require('../statics/cross.svg')
   *   console.log(event)
   * })
   * invoice.create(document.getElementById('invoice-container'))
+  *
+  * // When you're done with invoice on client-side, it's important to call destroy.
+  * // Otherwise, you may end up with memory-leaks.
+  * invoice.destroy()
   */
 class Invoice {
-  constructor (opts = {}, invoice = {}) {    
+  constructor (opts = {}, invoice = {}) {
     this._instance = {}
-    
+
     Object.assign(this, _.cloneDeep(config.invoice), invoice)
     Object.assign(this._instance, _.cloneDeep(config.options), opts)
   }
@@ -216,13 +224,13 @@ class Invoice {
    * @param {number} seconds Seconds from time of creation that Payment Request expires
    * @example
    * // 15 minutes
-   * invoice.setExpiration(15 * 60)
+   * invoice.setExpires(15 * 60)
    */
   setExpires (seconds) {
     this.expires = seconds
     return this
   }
-  
+
   /**
    * Sets a BIP70/JPP memo
    * @param {string} memo Memo text
@@ -234,7 +242,7 @@ class Invoice {
     this.memo = memo
     return this
   }
-  
+
   /**
    * &lt;p>Sets Merchant Data associated with invoice&lt;/p>
    * &lt;p>&lt;strong>This must be Base64 encoded&lt;/strong>&lt;/p>
@@ -242,7 +250,7 @@ class Invoice {
    * @example
    * // Node
    * invoice.setMerchantData(Buffer.from('INVOICE_001', 'base64'))
-   * 
+   *
    * // Browser
    * invoice.setMerchantData(btoa('INVOICE_001'))
    */
@@ -253,9 +261,8 @@ class Invoice {
 
   /**
    * &lt;p>Sets the API Key&lt;/p>
-   * &lt;p>If a Merchant sets this key, it gives them elevated access to an invoice meaning they
-   * can use this later to retrieve a list of invoices (with this key set) that failed and
-   * manually re-trigger the sending of Webhooks.&lt;/p>
+   * &lt;p>An arbitrary API Key that can be used to later retrieve invoice information.&lt;/p>
+   * &lt;p>&lt;small>This should never be used if the invoice is created client-side (in the browser).&lt;/small>&lt;/p>
    * @example
    * invoice.setAPIKey('https://t.me/yourname|SECURE_STRING')
    */
@@ -299,27 +306,30 @@ class Invoice {
   }
 
   /**
-   * Set Webhook
-   * @param {(Array|String)} events The type of Webhook (requested, broadcasted, etc)
+   * &lt;p>Set Webhook&lt;/p>
+   * &lt;p>Used to notify server endpoint of transaction event.&lt;/p>
+   * &lt;p>Note that a JSON response can be returned by the server to modify the fields:
+   * "data" and "privateData".&lt;/p>
    * @param {String} endpoint The endpoint that should be hit
+   * @param {(Array|String)} events The type of Webhook (broadcasting, broadcasted, confirmed)
    * @example
-   * // Set single Webhook
+   * // Set Webhook (defaults to broadcasting, broadcasted and confirmed)
    * let invoice = new Invoice();
-   * invoice.setWebhook("broadcasted", 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
+   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
    *
-   * // Set multiple Webhooks
+   * // Only trigger on "broadcasting" and "broadcasted"
    * let invoice = new Invoice();
-   * invoice.setWebhook(['broadcasting', 'broadcasted', 'confirmed'], 'https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])
    */
   setWebhook (endpoint, events = ['broadcasting', 'broadcasted', 'confirmed']) {
     if (typeof events === 'string') {
       events = [events]
     }
-    
+
     events.forEach(event => {
       this.webhook[event] = endpoint
     })
-    
+
     return this
   }
 
@@ -351,7 +361,7 @@ class Invoice {
 
     try {
       if (!this._id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', _.omit(this, '_instance'))
+        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
@@ -381,20 +391,26 @@ class Invoice {
   /**
    * &lt;p>Get the payload of the invoice.&lt;/p>
    * &lt;p>This function can be used to pass the invoice back to the browser from the server-side.&lt;/p>
-   * @param {boolean} [publicOnly=true] Only return properties that should be visible to the end user (hide private options)
+   * &lt;p>&lt;small>The fields [apiKey, privateData, webhook, events] will be omitted from the payload&lt;/small>&lt;/p>
    * @example
    * // Get JSON payload
    * let payload = invoice.getPayload()
-   *
-   * // Get FULL JSON payload (security risk!)
-   * let payload = invoice.getPayload(true)
    */
-  payload (publicOnly = true) {
-    if (publicOnly) {
-      return _.omit(this, 'options', '_instance')
-    }
+  payload () {
+    return _.omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
+  }
 
-    return _.omit(this, '_instance')
+  /**
+   * &lt;p>Destroy the invoice instance.&lt;/p>
+   * &lt;p>This function should be used to clear all listeners from the invoice.&lt;/p>
+   * &lt;p>If this is not called, you will likely end up with dangling references that might cause funky behavior.&lt;/p>
+   * @example
+   * // Destroy the invoice to prevent memory-leaks/dangling references
+   * invoice.destroy()
+   */
+  async destroy () {
+    this._instance.socket.disconnect()
+    clearInterval(this._instance.expiryTimer)
   }
 
   /**
@@ -454,16 +470,11 @@ class Invoice {
    */
   _setupContainer (container, options) {
     options = Object.assign({
-      color: '#000',
-      scale: 12,
-      margin: 0,
       template: template,
       lang: {
-        openInWallet: 'Open in Wallet',
         expiresIn: 'Expires in ',
         invoiceHasExpired: 'Invoice has expired',
-        expired: 'Expired',
-        paymentReceived: 'Payment received'
+        expired: 'Expired'
       }
     }, options)
 
@@ -474,23 +485,23 @@ class Invoice {
 
     // Find container elements
     const subContainerEl = container.querySelector('.cashpay-container')
+    const qrCodeLinkEl = container.querySelector('.cashpay-qr-code-link')
     const qrCodeEl = container.querySelector('.cashpay-qr-code')
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
-    const buttonEl = container.querySelector('.cashpay-button')
     const errorEl = container.querySelector('.cashpay-error')
 
     // Trigger on invoice creation...
     this.on('created', async () => {
       // Render QR Code
-      qrCodeEl.src = await QRCode.toDataURL(this.service.walletURI, {
-        color: {
-          dark: options.color
-        },
-        scale: options.scale,
-        margin: options.margin
+      qrCodeEl.innerHTML = await QRCode.toString(this.service.walletURI, {
+        type: 'svg',
+        margin: 0
       })
+
+      // Set link on QR Code
+      qrCodeLinkEl.href = this.service.walletURI
 
       // Set totals for BCH and Fiat
       totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
@@ -498,32 +509,25 @@ class Invoice {
       // Show value in BCH
       totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
 
-      // Set the button text and url
-      buttonEl.innerText = options.lang.openInWallet
-      buttonEl.href = this.service.walletURI
-
       // Show the subcontainer
       subContainerEl.style.display = 'block'
     })
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      buttonEl.innerText = options.lang.paymentReceived
-      buttonEl.classList.add('animate__pulse')
-
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(tick.replace('#000', options.color))}`
+      subContainerEl.classList.add('broadcasted')
+      qrCodeEl.innerHTML = tick
       qrCodeEl.classList.add('animate__pulse')
-      buttonEl.removeAttribute('href')
+      qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = ''
     })
 
     // Trigger on invoice expiry
     this.on('expired', () => {
-      qrCodeEl.src = `data:image/svg+xml;base64,${btoa(cross.replace('#000', options.color))}`
+      subContainerEl.classList.add('expired')
+      qrCodeEl.innerHTML = cross
       qrCodeEl.classList.add('animate__pulse')
-      buttonEl.removeAttribute('href')
-      buttonEl.innerText = options.lang.expired
-      buttonEl.classList.add('animate__pulse')
+      qrCodeLinkEl.removeAttribute('href')
       expiresEl.innerText = options.lang.invoiceHasExpired
     })
 
@@ -552,7 +556,7 @@ module.exports = Invoice
 </div>
 
 <footer>
-    <img class="logo" src="/logo.svg" style="">
+    <img class="logo" src="https://raw.githubusercontent.com/developers-cash/cash-pay-server/master/logo.svg" style="">
     <div class="footer-text"><a href="https://infra.cash">https://infra.cash</a></div>
 </footer>
 <script>prettyPrint();</script>
