@@ -182,7 +182,7 @@ async function webhookEndpoint(req, res) {
 }
 </code></pre>
 <p>Webhooks that do not give a 200 status code are considered failures.</p>
-<h2>Using a difference CashPayServer Instance</h2>
+<h2>Using a different CashPayServer Instance</h2>
 <p>See documentation about <a href="https://developers-cash.github.io/cash-pay-server-js/">Self-Hosting</a>.</p>
 <pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers-cash/cash-pay-server-js')
 
@@ -190,6 +190,8 @@ CashPay.config.options.endpoint = 'https://pay.your-instance.com'
 </code></pre>
 <h2>Creating an Invoice Client-Side</h2>
 <p>Invoices can also be created directly in the browser.</p>
+<p>Note that creating the invoice in the browser is insecure for most use-cases.</p>
+<p>However, it can be useful for testing.</p>
 <pre class="prettyprint source lang-html"><code>&lt;!-- head -->
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
 
@@ -207,7 +209,34 @@ async function createInvoice() {
 createInvoice()
 &lt;/script>
 </code></pre>
-<p>Note that creating the invoice in the browser is insecure for most use-cases.</p></article>
+<h2>Other common use-cases</h2>
+<pre class="prettyprint source lang-javascript"><code>// Changing the expiry time on an invoice
+invoice.setExpires(60*5) // Five minutes
+
+// Set the memo that the user sees
+invoice.setMemo('Please confirm your order')
+
+//Set Merchant Data (as per BIP70 spec)
+invoice.setMerchantData(JSON.stringify({
+  someWalletFeature: true
+}))
+
+// Set Public Data (will be available in WebSocket events - i.e. not private)
+invoice.setData(&quot;InvoiceID:1000&quot;) // String
+invoice.setData({
+  redirectURL: '/download/someSecureFile.mp4'
+})
+
+// Set Private Data (only accessible through Admin and Webhooks)
+invoice.setPrivateData(&quot;Some String&quot;) // String
+invoice.setPrivateData({ some: &quot;String&quot;}) // Objects will be cast to a string
+
+// Set user currency (Currency equivalent of BCH will be shown on rendered invoice)
+invoice.setUserCurrency('AUD') // Australian Dollars
+</code></pre>
+<h2>Issues/Feature Requests</h2>
+<p>Please submit any issues with the library to the <a href="https://github.com/developers-cash/cash-pay-server-js/issues">Github Repo's Issues Tracker</a>.</p>
+<p>I'm also contactable on Telegram via <a href="https://t.me/jimtendo">https://t.me/jimtendo</a></p></article>
     </section>
 
 

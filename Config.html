@@ -52,7 +52,7 @@
         
             <div class="class-description">Global Config used by Cash Pay Server
 
-These are usually default values that will be used when an invoice is created.</div>
+These are default values that will be used when an invoice is created.</div>
         
     
 </header>
@@ -185,7 +185,7 @@ let invoice == CashPay.Invoice(...)</code></pre>
     
     <div class="container-source members">
         <code><a href="config.js.html">config.js</a></code>,
-        <code><a href="config.js.html#line55">line 55</a></code>
+        <code><a href="config.js.html#line56">line 56</a></code>
     </div>
     
 </h4>
@@ -248,9 +248,10 @@ Default values and valid properties are shown below in the example
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>{
-  behavior: 'normal',
   network: 'main'
-  userCurrency: 'USD'
+  outputs: [],
+  userCurrency: 'USD',
+  webhook: {}
 }</code></pre>
 
     
@@ -328,7 +329,7 @@ Default values and valid properties are shown below in the example.
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>{
-  endpoint: 'https://pay.infra.cash',
+  endpoint: 'https://v1.pay.infra.cash',
   listen: typeof window !== 'undefined' // false if not in browser
 }</code></pre>
 
