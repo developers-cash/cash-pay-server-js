@@ -148,7 +148,7 @@ async function webhookEndpoint(req, res) {
 
 Webhooks that do not give a 200 status code are considered failures.
 
-## Using a difference CashPayServer Instance
+## Using a different CashPayServer Instance
 
 See documentation about [Self-Hosting](https://developers-cash.github.io/cash-pay-server-js/).
 
@@ -161,6 +161,10 @@ CashPay.config.options.endpoint = 'https://pay.your-instance.com'
 ## Creating an Invoice Client-Side
 
 Invoices can also be created directly in the browser.
+
+Note that creating the invoice in the browser is insecure for most use-cases.
+
+However, it can be useful for testing.
 
 ```html
 <!-- head -->
@@ -181,4 +185,36 @@ createInvoice()
 </script>
 ```
 
-Note that creating the invoice in the browser is insecure for most use-cases.
+## Other common use-cases
+
+```javascript
+// Changing the expiry time on an invoice
+invoice.setExpires(60*5) // Five minutes
+
+// Set the memo that the user sees
+invoice.setMemo('Please confirm your order')
+
+//Set Merchant Data (as per BIP70 spec)
+invoice.setMerchantData(JSON.stringify({
+  someWalletFeature: true
+}))
+
+// Set Public Data (will be available in WebSocket events - i.e. not private)
+invoice.setData("InvoiceID:1000") // String
+invoice.setData({
+  redirectURL: '/download/someSecureFile.mp4'
+})
+
+// Set Private Data (only accessible through Admin and Webhooks)
+invoice.setPrivateData("Some String") // String
+invoice.setPrivateData({ some: "String"}) // Objects will be cast to a string
+
+// Set user currency (Currency equivalent of BCH will be shown on rendered invoice)
+invoice.setUserCurrency('AUD') // Australian Dollars
+```
+
+## Issues/Feature Requests
+
+Please submit any issues with the library to the [Github Repo's Issues Tracker](https://github.com/developers-cash/cash-pay-server-js/issues).
+
+I'm also contactable on Telegram via [https://t.me/jimtendo](https://t.me/jimtendo)

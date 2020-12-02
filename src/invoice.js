@@ -29,13 +29,13 @@ const cross = require('../statics/cross.svg')
   * // Server-side
   * //
   * let invoice = new CashPay.Invoice()
-  *   .setMerchantKey('your.site|SECURE_KEY_123')
+  *   .setAPIKey('your.site|SECURE_KEY_123')
   *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-  *   .setWebhooks(['https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2')
+  *   .setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2'. ['confirmed'])
   * await invoice.create()
   *
   * // Send Payload JSON to browser
-  * return invoice.getPayload()
+  * return invoice.payload()
   *
   * //
   * // Client-side

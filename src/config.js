@@ -1,7 +1,7 @@
 /**
  * Global Config used by Cash Pay Server
  *
- * These are usually default values that will be used when an invoice is created.
+ * These are default values that will be used when an invoice is created.
  *
  * @example
  * // Use a self-hosted server
@@ -21,7 +21,7 @@ class Config {
      * Default values and valid properties are shown below in the example.
      * @example
      * {
-     *   endpoint: 'https://pay.infra.cash',
+     *   endpoint: 'https://v1.pay.infra.cash',
      *   listen: typeof window !== 'undefined' // false if not in browser
      * }
      */
@@ -47,9 +47,10 @@ class Config {
      * Default values and valid properties are shown below in the example
      * @example
      * {
-     *   behavior: 'normal',
      *   network: 'main'
-     *   userCurrency: 'USD'
+     *   outputs: [],
+     *   userCurrency: 'USD',
+     *   webhook: {}
      * }
      */
     this.invoice = {
