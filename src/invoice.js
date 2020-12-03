@@ -6,6 +6,7 @@ const SocketIO = require('socket.io-client')
 const QRCode = require('qrcode')
 
 const template = require('../statics/template.html')
+const loading = require('../statics/loading.svg')
 const tick = require('../statics/tick.svg')
 const cross = require('../statics/cross.svg')
 
@@ -40,11 +41,14 @@ const cross = require('../statics/cross.svg')
   * //
   * // Client-side
   * //
-  * let invoice = await CashPay.Invoice.fromServerEndpoint('your-endpoint-above')
-  * invoice.on(['broadcasting', 'broadcasted'], (event) {
-  *   console.log(event)
+  * let invoice = new CashPay.Invoice()
+  *   .intoContainer(document.getElementById('invoice-container'))
+  *   .on(['broadcasting', 'broadcasted'], (event) {
+  *     console.log(event)
+  *   })
+  * await invoice.createFrom('https://your-endpoint-above', {
+  *   items: ['ITEM-001', 'ITEM_002']
   * })
-  * invoice.create(document.getElementById('invoice-container'))
   *
   * // When you're done with invoice on client-side, it's important to call destroy.
   * // Otherwise, you may end up with memory-leaks.
@@ -56,41 +60,6 @@ class Invoice {
 
     Object.assign(this, _.cloneDeep(config.invoice), invoice)
     Object.assign(this._instance, _.cloneDeep(config.options), opts)
-  }
-
-  /**
-   * <p>Create an instance from an existing invoice.</p>
-   * <p>This should be used if, for example, the invoice is being created from a server-side endpoint.</p>
-   * @param {object} existingInvoice The existing invoice (created from the server-side)
-   * @param {object} options List of options to set upon creation.
-   * @example
-   * let invoice = CashPay.Invoice.fromExisting(invoicePayload)
-   * await invoice.create(document.getElementById('invoice-container'))
-   */
-  static fromExisting (existingInvoice, options = {}) {
-    const invoice = new Invoice()
-    Object.assign(invoice, existingInvoice)
-    invoice._instance = Object.assign({}, config.options, options)
-
-    return invoice
-  }
-
-  /**
-   * <p>Convenience function to create an invoice from the data returned from
-   * the given server-side endpoint.</p>
-   * @param {string} endpoint The endpoint to retreive the invoice from
-   * @param {object} params The parameters to pass to the endpoint
-   * @param {object} options The options to specify (see axios.post options)
-   * @example
-   * let invoice = CashPay.Invoice.fromServerEndpoint('/create-invoice', {
-   *   orderId: "xxxx"
-   * });
-   *
-   * await invoice.create(document.getElementById('invoice-container'))
-   */
-  static async fromServerEndpoint (endpoint, params, options) {
-    const res = await axios.post(endpoint, params, options)
-    return this.fromExisting(res.data)
   }
 
   /**
@@ -110,15 +79,15 @@ class Invoice {
    * // Add listener for failed event
    * let invoice = new CashPay.Invoice()
    *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1AAAA')
-   *   .on('failed', (err) {
+   *   .on('failed', err => {
    *     alert(err.message)
    *   }
    *
    * // Add event listener for broadcasting and broadcasted event
    * let invoice = new CashPay.Invoice()
    *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1AAAA')
-   *   .on(['broadcasting', 'broadcasted'], (event) {
-   *     console.log(event)
+   *   .on(['broadcasting', 'broadcasted'], e => {
+   *     console.log(e)
    *   }
    */
   on (events, callback) {
@@ -264,12 +233,12 @@ class Invoice {
    * @param {(Array|String)} events The type of Webhook (broadcasting, broadcasted, confirmed)
    * @example
    * // Set Webhook (defaults to broadcasting, broadcasted and confirmed)
-   * let invoice = new Invoice();
-   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
+   * let invoice = new CashPay.Invoice();
+   *   .setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
    *
    * // Only trigger on "broadcasting" and "broadcasted"
-   * let invoice = new Invoice();
-   * invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])
+   * let invoice = new CashPay.Invoice();
+   *   .setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])
    */
   setWebhook (endpoint, events = ['broadcasting', 'broadcasted', 'confirmed']) {
     if (typeof events === 'string') {
@@ -285,30 +254,19 @@ class Invoice {
 
   /**
    * <p>Create the invoice.</p>
-   * <p>If "id" does not exist on invoice, a new Invoice will be requested from the CashPayServer.</p>
    * @param {DOMElement} [container] DOM Element to render CashPay in
    * @param {Object} [options] Options for container rendering
    * @example
    * // Using default container
    * let invoice = new CashPay.Invoice()
-   * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-   * await invoice.create(document.getElementById('invoice-container'))
-   *
-   * // Using default container with options
-   * let invoice = new CashPay.Invoice()
-   * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-   * await invoice.create(document.getElementById('invoice-container'), { color: '#000' })
-   *
-   * // No Container (e.g. handle rendering with reactive properties)
-   * let invoice = new CashPay.Invoice()
-   * invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-   * await invoice.create();
+   *   .intoContainer(document.getElementById('invoice-container'))
+   *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
+   *   .on('broadcasted', e => {
+   *     console.log(e)
+   *   })
+   * await invoice.create()
    */
-  async create (container, options) {
-    if (container) {
-      this._setupContainer(container, Object.assign({ margin: 0 }, options))
-    }
-
+  async create () {
     try {
       if (!this._id) {
         const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
@@ -321,8 +279,7 @@ class Invoice {
 
         // Setup event listener for expired and broadcasted to stop Websocket listener
         this.on(['expired', 'broadcasted'], (secondsRemaining) => {
-          clearInterval(this._instance.expiryTimer)
-          this._instance.socket.disconnect(true)
+          this.destroy()
         })
 
         await this._listen()
@@ -333,7 +290,58 @@ class Invoice {
       return this
     } catch (err) {
       this._instance.on.failed.forEach(cb => cb(err))
-      console.error(err)
+      throw err
+    }
+  }
+
+  /**
+   * <p>Instantiate the invoice from a server-side endpoint.</p>
+   * @param {String} [endpoint] The endpoint to use
+   * @param {Object} [params] POST parameters to send to endpoint
+   * @example
+   * // Using default container
+   * const invoice = new CashPay.Invoice()
+   *   .intoContainer(document.getElementById('invoice-container'))
+   *   .on('broadcasted', e => {
+   *     console.log(e)
+   *   })
+   * await invoice.createFrom('https://api.your-site.com/request-invoice', {
+   *   items: ['ITEM_001', 'ITEM_002']
+   * })
+   */
+  async createFrom (endpoint, params = {}) {
+    try {
+      const res = await axios.post(endpoint, params)
+      Object.assign(this, res.data)
+      await this.create()
+    } catch (err) {
+      this._instance.on.failed.forEach(cb => cb(err))
+      throw err
+    }
+  }
+
+  /**
+   * <p>Instantiate the invoice from an existing invoice.</p>
+   * <p>Similar to createFrom, but where you handle the AJAX request.</p>
+   * @param {Object} [params] POST parameters to send to endpoint
+   * @example
+   * const res = axios.post('https://api.your-site.com/request-invoice', {
+   *   items: ['ITEM_001', 'ITEM_002']
+   * })
+   *
+   * let invoice = new CashPay.Invoice()
+   *   .intoContainer(document.getElementById('invoice-container'))
+   *   .on('broadcasted', e => {
+   *     console.log(e)
+   *   })
+   * await invoice.createFromExisting(res.data.invoice)
+   */
+  async createFromExisting (invoice) {
+    try {
+      Object.assign(this, invoice)
+      await this.create()
+    } catch (err) {
+      this._instance.on.failed.forEach(cb => cb(err))
       throw err
     }
   }
@@ -354,6 +362,7 @@ class Invoice {
    * <p>Destroy the invoice instance.</p>
    * <p>This function should be used to clear all listeners from the invoice.</p>
    * <p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
+   * <p><small>Note this does not destroy the container, but the timers/websocket listener</small></p>
    * @example
    * // Destroy the invoice to prevent memory-leaks/dangling references
    * invoice.destroy()
@@ -416,20 +425,35 @@ class Invoice {
   }
 
   /**
-   * @private
+   * <p>Load the invoice into a DOM container.</p>
+   * <p>If the DOM element is empty, default template will be used.</p>
+   * @param {DOMElement} container Container to load into
+   * @param {String} options.lang.expiresIn Text to use for Expires In
+   * @param {String} options.lang.invoiceHasExpired Text to use when Invoice has expired
+   * @example
+   * // No options
+   * const invoice = new CashPay.Invoice()
+   *   .intoContainer(document.getElementById('invoice-container')
+   *
+   * // Change Invoice Expired Text for Captcha
+   * const invoice = new CashPay.Invoice()
+   *   .intoContainer(document.getElementById('invoice-container', {
+   *     lang: {
+   *       invoiceHasExpired: 'Captcha has expired'
+   *     }
+   *   })
    */
-  _setupContainer (container, options) {
+  intoContainer (container, options) {
     options = Object.assign({
       template: template,
       lang: {
         expiresIn: 'Expires in ',
-        invoiceHasExpired: 'Invoice has expired',
-        expired: 'Expired'
+        invoiceHasExpired: 'Invoice has expired'
       }
     }, options)
 
     // Inject template (otherwise, assume it's already there)
-    if (options.template) {
+    if (options.template && container.innerHTML.trim() === '') {
       container.innerHTML = options.template
     }
 
@@ -442,8 +466,15 @@ class Invoice {
     const expiresEl = container.querySelector('.cashpay-expires')
     const errorEl = container.querySelector('.cashpay-error')
 
+    // Set loading SVG
+    subContainerEl.classList.add('loading')
+    qrCodeEl.innerHTML = loading
+
     // Trigger on invoice creation...
     this.on('created', async () => {
+      // Remove loading class
+      subContainerEl.classList.remove('loading')
+
       // Render QR Code
       qrCodeEl.innerHTML = await QRCode.toString(this.service.walletURI, {
         type: 'svg',
@@ -492,6 +523,8 @@ class Invoice {
     this.on('failed', (err) => {
       errorEl.innerText = err.message
     })
+
+    return this
   }
 }
 

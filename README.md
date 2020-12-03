@@ -29,7 +29,8 @@ const CashPay = require('@developers-cash/cash-pay-server-js')
 // Create invoice 
 async function requestInvoice(req, res) {
   try {
-    // Do things - get list of items in order, etc
+    // Do things - get list of items in order, calculate totals, etc
+    // req.body.items
 
     // Create the invoice
     let invoice = new CashPay.Invoice()
@@ -78,22 +79,20 @@ Render the created invoice on your client-side
 <script>
 async function fetchInvoice() {
   // Request invoice from server endpoint
-  let invoice = await CashPay.Invoice.fromServerEndpoint('https://api.yoursite.com/request-invoice', {
-    // Optional POST params to pass to server-side
-    // items: [ ... ]
-  })
-
-  // Setup event listener for broadcasted event
-  invoice.on(['broadcasted'], e => {
-    axios.post('https://api.yoursite.com/invoice-paid', {
-      event: e
-    })
+  let invoice = new CashPay.Invoice()
+    .intoContainer(document.getElementById('invoice-container'))
+    .on(['broadcasted'], e => {
+      axios.post('https://api.yoursite.com/invoice-paid', {
+        event: e
+      })
     
-    invoice.destroy()
-  })
+      invoice.destroy()
+    })
 
-  // Render the default Invoice UI in a HTML container
-  await invoice.create(document.getElementById('invoice-container'))
+  // Fetch the invoice that we created on the server-side
+  await invoice.createFrom('https://api.yoursite.com/request-invoice', {
+    items: ['ITEM_001', 'ITEM-002']
+  })
 }
 
 fetchInvoice()
@@ -109,6 +108,10 @@ The default template uses inline SVG's and can be styled using CSS:
   font-size: 0.8em;
 }
 
+#invoice-container .cashpay-loading {
+  fill: #00c58a !important;
+}
+
 #invoice-container .cashpay-tick {
   fill: #00c58a !important;
 }
@@ -120,26 +123,47 @@ The default template uses inline SVG's and can be styled using CSS:
 
 ## Webhooks
 
-Webhooks are also available.
+Webhooks are also available. Using Webhooks instead of the Websocket Events generally provides more resilience
+over passing Websocket events to the server-side, but are also more difficult to implement as they require
+a public facing URL.
+
+
+
 
 ```javascript
 async function requestInvoice(req, res) {
   // ...
-  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['confirmed'])
+  // It's recommended to include "broadcasting" even if you do not use it explicitly.
+  // If your server is down and the "broadcasting" hook fails - the payment will not be broadcasted.
+  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['broadcasting', 'broadcasted', 'confirmed'])
   // ...
 }
 
 async function webhookEndpoint(req, res) {
   try {
+    // Verify signature of event (to prevent spoofing) - or check API Key if you don't want to play with signatures
     await CashPay.Signatures.verifyWebhook(req.body, req.headers)
     
-    // Do things - mark as confirmed, etc
+    // TODO You'll also want to check the InvoiceID to make sure YOU created this invoice
     
-    // If a JSON response is given, you can modify "data" and "privateData" on the invoice
-    res.send({
-      data: "SomeData",
-      privateData: "SomeOtherData"
-    })
+    if (req.body.event === 'broadcasted') {
+      // Do things - mark as paid in database, etc
+      
+      // If a JSON response is given, you can modify "data" and "privateData" on the invoice.
+      // 'data' will be available in the corresponding Websocket Event in the browser.
+      return res.send({
+        data: JSON.stringify({
+          redirectURL: 'https://your-site.com/link-to-some-secure-file.mp4'
+        })
+        privateData: 'SomeOtherData'
+      })
+    }
+    
+    if (req.body.event === 'confirmed') {
+      // Do things - mark as confirmed in database, etc
+    }
+    
+    res.send({ status: 'OK' })
   } catch (err) {
     return res.send(err)
   }
@@ -150,12 +174,13 @@ Webhooks that do not give a 200 status code are considered failures.
 
 ## Using a different CashPayServer Instance
 
-See documentation about [Self-Hosting](https://developers-cash.github.io/cash-pay-server-js/).
+See documentation about [Self-Hosting](https://developers-cash.github.io/cash-pay-server/).
 
 ```javascript
 const CashPay = require('@developers-cash/cash-pay-server-js')
 
 CashPay.config.options.endpoint = 'https://pay.your-instance.com'
+
 ```
 
 ## Creating an Invoice Client-Side
@@ -188,10 +213,13 @@ createInvoice()
 ## Other common use-cases
 
 ```javascript
+// Setting API Key across all new invoices
+CashPay.config.invoice.apiKey = 'someRandomString'
+
 // Changing the expiry time on an invoice
 invoice.setExpires(60*5) // Five minutes
 
-// Set the memo that the user sees
+// Set the memo that the user sees in wallet
 invoice.setMemo('Please confirm your order')
 
 //Set Merchant Data (as per BIP70 spec)

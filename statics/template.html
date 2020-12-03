@@ -1,6 +1,5 @@
 <style>
   .cashpay-container {
-    display: none;
     margin-bottom: 1em;
   }
 
@@ -15,6 +14,20 @@
   .cashpay-container .cashpay-qr-code svg {
     display: block;
   }
+  
+  .cashpay-container.loading .cashpay-qr-code {
+    border: none;
+  }
+  
+  .cashpay-container.loading .cashpay-qr-code svg {
+    -webkit-animation: cashpay-spin 4s linear infinite;
+    -moz-animation: cashpay-spin 4s linear infinite;
+    animation: cashpay-spin 4s linear infinite;
+  }
+  
+  @-moz-keyframes cashpay-spin { 100% { -moz-transform: rotate(360deg); } }
+  @-webkit-keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); } }
+  @keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
   
   .cashpay-container.expired .cashpay-qr-code, .cashpay-container.broadcasted .cashpay-qr-code {
     border: none;
@@ -42,7 +55,7 @@
     margin-bottom: 0.5em;
   }
   
-  .cashpay-container .cashpay-error {
+  .cashpay-error {
     color: #bb0101;
     font-weight: bold;
     text-align: center;
