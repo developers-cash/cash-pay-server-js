@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -75,7 +75,8 @@
 // Create invoice 
 async function requestInvoice(req, res) {
   try {
-    // Do things - get list of items in order, etc
+    // Do things - get list of items in order, calculate totals, etc
+    // req.body.items
 
     // Create the invoice
     let invoice = new CashPay.Invoice()
@@ -121,22 +122,20 @@ async function invoicePaid(req, res) {
 &lt;script>
 async function fetchInvoice() {
   // Request invoice from server endpoint
-  let invoice = await CashPay.Invoice.fromServerEndpoint('https://api.yoursite.com/request-invoice', {
-    // Optional POST params to pass to server-side
-    // items: [ ... ]
-  })
-
-  // Setup event listener for broadcasted event
-  invoice.on(['broadcasted'], e => {
-    axios.post('https://api.yoursite.com/invoice-paid', {
-      event: e
-    })
+  let invoice = new CashPay.Invoice()
+    .intoContainer(document.getElementById('invoice-container'))
+    .on(['broadcasted'], e => {
+      axios.post('https://api.yoursite.com/invoice-paid', {
+        event: e
+      })
     
-    invoice.destroy()
-  })
+      invoice.destroy()
+    })
 
-  // Render the default Invoice UI in a HTML container
-  await invoice.create(document.getElementById('invoice-container'))
+  // Fetch the invoice that we created on the server-side
+  await invoice.createFrom('https://api.yoursite.com/request-invoice', {
+    items: ['ITEM_001', 'ITEM-002']
+  })
 }
 
 fetchInvoice()
@@ -149,6 +148,10 @@ fetchInvoice()
   font-size: 0.8em;
 }
 
+#invoice-container .cashpay-loading {
+  fill: #00c58a !important;
+}
+
 #invoice-container .cashpay-tick {
   fill: #00c58a !important;
 }
@@ -158,24 +161,42 @@ fetchInvoice()
 }
 </code></pre>
 <h2>Webhooks</h2>
-<p>Webhooks are also available.</p>
+<p>Webhooks are also available. Using Webhooks instead of the Websocket Events generally provides more resilience
+over passing Websocket events to the server-side, but are also more difficult to implement as they require
+a public facing URL.</p>
 <pre class="prettyprint source lang-javascript"><code>async function requestInvoice(req, res) {
   // ...
-  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['confirmed'])
+  // It's recommended to include &quot;broadcasting&quot; even if you do not use it explicitly.
+  // If your server is down and the &quot;broadcasting&quot; hook fails - the payment will not be broadcasted.
+  invoice.setWebhook('https://api.your-site.com/webhook-endpoint', ['broadcasting', 'broadcasted', 'confirmed'])
   // ...
 }
 
 async function webhookEndpoint(req, res) {
   try {
+    // Verify signature of event (to prevent spoofing) - or check API Key if you don't want to play with signatures
     await CashPay.Signatures.verifyWebhook(req.body, req.headers)
     
-    // Do things - mark as confirmed, etc
+    // TODO You'll also want to check the InvoiceID to make sure YOU created this invoice
     
-    // If a JSON response is given, you can modify &quot;data&quot; and &quot;privateData&quot; on the invoice
-    res.send({
-      data: &quot;SomeData&quot;,
-      privateData: &quot;SomeOtherData&quot;
-    })
+    if (req.body.event === 'broadcasted') {
+      // Do things - mark as paid in database, etc
+      
+      // If a JSON response is given, you can modify &quot;data&quot; and &quot;privateData&quot; on the invoice.
+      // 'data' will be available in the corresponding Websocket Event in the browser.
+      return res.send({
+        data: JSON.stringify({
+          redirectURL: 'https://your-site.com/link-to-some-secure-file.mp4'
+        })
+        privateData: 'SomeOtherData'
+      })
+    }
+    
+    if (req.body.event === 'confirmed') {
+      // Do things - mark as confirmed in database, etc
+    }
+    
+    res.send({ status: 'OK' })
   } catch (err) {
     return res.send(err)
   }
@@ -183,10 +204,11 @@ async function webhookEndpoint(req, res) {
 </code></pre>
 <p>Webhooks that do not give a 200 status code are considered failures.</p>
 <h2>Using a different CashPayServer Instance</h2>
-<p>See documentation about <a href="https://developers-cash.github.io/cash-pay-server-js/">Self-Hosting</a>.</p>
+<p>See documentation about <a href="https://developers-cash.github.io/cash-pay-server/">Self-Hosting</a>.</p>
 <pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers-cash/cash-pay-server-js')
 
 CashPay.config.options.endpoint = 'https://pay.your-instance.com'
+
 </code></pre>
 <h2>Creating an Invoice Client-Side</h2>
 <p>Invoices can also be created directly in the browser.</p>
@@ -210,10 +232,13 @@ createInvoice()
 &lt;/script>
 </code></pre>
 <h2>Other common use-cases</h2>
-<pre class="prettyprint source lang-javascript"><code>// Changing the expiry time on an invoice
+<pre class="prettyprint source lang-javascript"><code>// Setting API Key across all new invoices
+CashPay.config.invoice.apiKey = 'someRandomString'
+
+// Changing the expiry time on an invoice
 invoice.setExpires(60*5) // Five minutes
 
-// Set the memo that the user sees
+// Set the memo that the user sees in wallet
 invoice.setMemo('Please confirm your order')
 
 //Set Merchant Data (as per BIP70 spec)

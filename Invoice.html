@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#.fromExisting">fromExisting</a></li><li><a href="Invoice.html#.fromServerEndpoint">fromServerEndpoint</a></li><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -80,7 +80,7 @@ values directly.</small></p></div>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line53">line 53</a></code>
+                <code><a href="invoice.js.html#line57">line 57</a></code>
             </div>
             
         </h4>
@@ -240,11 +240,14 @@ return invoice.payload()
 //
 // Client-side
 //
-let invoice = await CashPay.Invoice.fromServerEndpoint('your-endpoint-above')
-invoice.on(['broadcasting', 'broadcasted'], (event) {
-  console.log(event)
+let invoice = new CashPay.Invoice()
+  .intoContainer(document.getElementById('invoice-container'))
+  .on(['broadcasting', 'broadcasted'], (event) {
+    console.log(event)
+  })
+await invoice.createFrom('https://your-endpoint-above', {
+  items: ['ITEM-001', 'ITEM_002'] 
 })
-invoice.create(document.getElementById('invoice-container'))
 
 // When you're done with invoice on client-side, it's important to call destroy.
 // Otherwise, you may end up with memory-leaks.
@@ -280,370 +283,6 @@ invoice.destroy()</code></pre>
 
 <dt>
     
-        <h4 class="name" id=".fromExisting">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>fromExisting<span class="signature">(existingInvoice, options)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line70">line 70</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Create an instance from an existing invoice.</p>
-<p>This should be used if, for example, the invoice is being created from a server-side endpoint.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>existingInvoice</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The existing invoice (created from the server-side)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">List of options to set upon creation.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>let invoice = CashPay.Invoice.fromExisting(invoicePayload)
-await invoice.create(document.getElementById('invoice-container'))</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".fromServerEndpoint">
-            
-                <span class="type-signature"><span class="icon green">async</span>, <span class="icon green">static</span> </span>fromServerEndpoint<span class="signature">(endpoint, params, options)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line91">line 91</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Convenience function to create an invoice from the data returned from
-the given server-side endpoint.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>endpoint</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The endpoint to retreive the invoice from</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The parameters to pass to the endpoint</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The options to specify (see axios.post options)</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>let invoice = CashPay.Invoice.fromServerEndpoint('/create-invoice', {
-  orderId: "xxxx"
-});
-
-await invoice.create(document.getElementById('invoice-container'))</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
         <h4 class="name" id="addAddress">
             
                 <span class="type-signature"></span>addAddress<span class="signature">(address, amount)</span><span class="type-signature"></span>
@@ -651,7 +290,7 @@ await invoice.create(document.getElementById('invoice-container'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line145">line 145</a></code>
+                <code><a href="invoice.js.html#line114">line 114</a></code>
             </div>
             
         </h4>
@@ -825,7 +464,7 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line163">line 163</a></code>
+                <code><a href="invoice.js.html#line132">line 132</a></code>
             </div>
             
         </h4>
@@ -1026,7 +665,7 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line307">line 307</a></code>
+                <code><a href="invoice.js.html#line269">line 269</a></code>
             </div>
             
         </h4>
@@ -1039,7 +678,6 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
     
     <div class="description">
         <p>Create the invoice.</p>
-<p>If "id" does not exist on invoice, a new Invoice will be requested from the CashPayServer.</p>
     </div>
     
 
@@ -1200,18 +838,375 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
         
     <pre class="prettyprint"><code>// Using default container
 let invoice = new CashPay.Invoice()
-invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-await invoice.create(document.getElementById('invoice-container'))
+  .intoContainer(document.getElementById('invoice-container'))
+  .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
+  .on('broadcasted', e => {
+    console.log(e)
+  })
+await invoice.create()</code></pre>
 
-// Using default container with options
-let invoice = new CashPay.Invoice()
-invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-await invoice.create(document.getElementById('invoice-container'), { color: '#000' })
+    
 
-// No Container (e.g. handle rendering with reactive properties)
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="createFrom">
+            
+                <span class="type-signature"><span class="icon green">async</span> </span>createFrom<span class="signature">(endpoint<span class="signature-attributes">opt</span>, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line312">line 312</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Instantiate the invoice from a server-side endpoint.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>endpoint</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The endpoint to use</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">POST parameters to send to endpoint</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// Using default container
+const invoice = new CashPay.Invoice()
+  .intoContainer(document.getElementById('invoice-container'))
+  .on('broadcasted', e => {
+    console.log(e)
+  })
+await invoice.createFrom('https://api.your-site.com/request-invoice', {
+  items: ['ITEM_001', 'ITEM_002']
+})</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="createFromExisting">
+            
+                <span class="type-signature"><span class="icon green">async</span> </span>createFromExisting<span class="signature">(params<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line339">line 339</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Instantiate the invoice from an existing invoice.</p>
+<p>Similar to createFrom, but where you handle the AJAX request.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">POST parameters to send to endpoint</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const res = axios.post('https://api.your-site.com/request-invoice', {
+  items: ['ITEM_001', 'ITEM_002']
+})
+
 let invoice = new CashPay.Invoice()
-invoice.addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
-await invoice.create();</code></pre>
+  .intoContainer(document.getElementById('invoice-container'))
+  .on('broadcasted', e => {
+    console.log(e)
+  })
+await invoice.createFromExisting(res.data.invoice)</code></pre>
 
     
 
@@ -1229,7 +1224,7 @@ await invoice.create();</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line361">line 361</a></code>
+                <code><a href="invoice.js.html#line370">line 370</a></code>
             </div>
             
         </h4>
@@ -1244,6 +1239,7 @@ await invoice.create();</code></pre>
         <p>Destroy the invoice instance.</p>
 <p>This function should be used to clear all listeners from the invoice.</p>
 <p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
+<p><small>Note this does not destroy the container, but the timers/websocket listener</small></p>
     </div>
     
 
@@ -1319,6 +1315,207 @@ invoice.destroy()</code></pre>
 
 <dt>
     
+        <h4 class="name" id="intoContainer">
+            
+                <span class="type-signature"></span>intoContainer<span class="signature">(container)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line446">line 446</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Load the invoice into a DOM container.</p>
+<p>If the DOM element is empty, default template will be used.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>container</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DOMElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Container to load into</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.lang.expiresIn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Text to use for Expires In</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.lang.invoiceHasExpired</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Text to use when Invoice has expired</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// No options 
+const invoice = new CashPay.Invoice()
+  .intoContainer(document.getElementById('invoice-container')
+
+// Change Invoice Expired Text for Captcha
+const invoice = new CashPay.Invoice()
+  .intoContainer(document.getElementById('invoice-container', {
+    lang: {
+      invoiceHasExpired: 'Captcha has expired'
+    }
+  }) </code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
         <h4 class="name" id="on">
             
                 <span class="type-signature"></span>on<span class="signature">(events, callback)</span><span class="type-signature"></span>
@@ -1326,7 +1523,7 @@ invoice.destroy()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line124">line 124</a></code>
+                <code><a href="invoice.js.html#line93">line 93</a></code>
             </div>
             
         </h4>
@@ -1485,15 +1682,15 @@ invoice.destroy()</code></pre>
     <pre class="prettyprint"><code>// Add listener for failed event
 let invoice = new CashPay.Invoice()
   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1AAAA')
-  .on('failed', (err) {
+  .on('failed', err => {
     alert(err.message)
   }
 
 // Add event listener for broadcasting and broadcasted event
 let invoice = new CashPay.Invoice()
   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1AAAA')
-  .on(['broadcasting', 'broadcasted'], (event) {
-    console.log(event)
+  .on(['broadcasting', 'broadcasted'], e => {
+    console.log(e)
   }</code></pre>
 
     
@@ -1512,7 +1709,7 @@ let invoice = new CashPay.Invoice()
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line349">line 349</a></code>
+                <code><a href="invoice.js.html#line357">line 357</a></code>
             </div>
             
         </h4>
@@ -1609,7 +1806,7 @@ let payload = invoice.getPayload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line219">line 219</a></code>
+                <code><a href="invoice.js.html#line188">line 188</a></code>
             </div>
             
         </h4>
@@ -1705,7 +1902,7 @@ let payload = invoice.getPayload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line179">line 179</a></code>
+                <code><a href="invoice.js.html#line148">line 148</a></code>
             </div>
             
         </h4>
@@ -1850,7 +2047,7 @@ invoice.setExpires(15 * 60)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line191">line 191</a></code>
+                <code><a href="invoice.js.html#line160">line 160</a></code>
             </div>
             
         </h4>
@@ -1995,7 +2192,7 @@ invoice.setMemo("Payment to YOUR_SERVICE_NAME")</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line207">line 207</a></code>
+                <code><a href="invoice.js.html#line176">line 176</a></code>
             </div>
             
         </h4>
@@ -2144,7 +2341,7 @@ invoice.setMerchantData(btoa('INVOICE_001'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line237">line 237</a></code>
+                <code><a href="invoice.js.html#line206">line 206</a></code>
             </div>
             
         </h4>
@@ -2298,7 +2495,7 @@ invoice.setPrivateData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line253">line 253</a></code>
+                <code><a href="invoice.js.html#line222">line 222</a></code>
             </div>
             
         </h4>
@@ -2443,7 +2640,7 @@ invoice.setUserCurrency('AUD')</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line274">line 274</a></code>
+                <code><a href="invoice.js.html#line243">line 243</a></code>
             </div>
             
         </h4>
@@ -2599,12 +2796,12 @@ invoice.setUserCurrency('AUD')</code></pre>
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>// Set Webhook (defaults to broadcasting, broadcasted and confirmed)
-let invoice = new Invoice();
-invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
+let invoice = new CashPay.Invoice();
+  .setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2');
 
 // Only trigger on "broadcasting" and "broadcasted"
-let invoice = new Invoice();
-invoice.setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])</code></pre>
+let invoice = new CashPay.Invoice();
+  .setWebhook('https://webhook.site/1aa1cc3b-8ee8-4f70-a4cd-abc0c9b8d1f2', ['broadcasting', 'broadcasted'])</code></pre>
 
     
 
