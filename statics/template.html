@@ -3,7 +3,7 @@
     margin-bottom: 1em;
   }
 
-  .cashpay-container .cashpay-qr-code {
+  .cashpay-container .cashpay-svg-container {
     width: 100%;
     max-width: 100%;
     margin-bottom: 1em;
@@ -11,15 +11,15 @@
     padding: 0.5em;
   }
   
-  .cashpay-container .cashpay-qr-code svg {
+  .cashpay-container .cashpay-svg-container svg {
     display: block;
   }
   
-  .cashpay-container.loading .cashpay-qr-code {
+  .cashpay-container.loading .cashpay-svg-container {
     border: none;
   }
   
-  .cashpay-container.loading .cashpay-qr-code svg {
+  .cashpay-container.loading .cashpay-svg-container svg {
     -webkit-animation: cashpay-spin 4s linear infinite;
     -moz-animation: cashpay-spin 4s linear infinite;
     animation: cashpay-spin 4s linear infinite;
@@ -29,7 +29,7 @@
   @-webkit-keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); } }
   @keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
   
-  .cashpay-container.expired .cashpay-qr-code, .cashpay-container.broadcasted .cashpay-qr-code {
+  .cashpay-container.expired .cashpay-svg-container, .cashpay-container.broadcasted .cashpay-svg-container {
     border: none;
     padding: 0;
   }
@@ -63,9 +63,9 @@
 </style>
 
 <div class="cashpay-container animate__animated animate__fadeIn">
-  <div class="cashpay-qr-code-container">
-    <a class="cashpay-qr-code-link" title="Click to open in wallet">
-      <div class="cashpay-qr-code animate__animated"></div>
+  <div>
+    <a class="cashpay-link" title="Click to open in wallet">
+      <div class="cashpay-svg-container animate__animated"></div>
     </a>
   </div>
   <div class="cashpay-below">

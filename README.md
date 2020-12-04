@@ -108,15 +108,15 @@ The default template uses inline SVG's and can be styled using CSS:
   font-size: 0.8em;
 }
 
-#invoice-container .cashpay-loading {
+.cashpay-loading {
   fill: #00c58a !important;
 }
 
-#invoice-container .cashpay-tick {
+.cashpay-tick {
   fill: #00c58a !important;
 }
 
-#invoice-container .cashpay-cross {
+.cashpay-cross {
   fill: #F00 !important;
 }
 ```

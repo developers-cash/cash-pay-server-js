@@ -23,6 +23,8 @@ const cross = require('../statics/cross.svg')
   * Only use setters to modify the parameters of an invoice - do not set
   * values directly.</small></p>
   *
+  * @property {String} id - ID of the invoice
+  *
   * @param {object} opts Options for invoice instance (use setters instead)
   * @param {object} invoice Invoice properties (use setters instead)
   * @example
@@ -181,6 +183,7 @@ class Invoice {
   /**
    * <p>Sets the API Key</p>
    * <p>An arbitrary API Key that can be used to later retrieve invoice information.</p>
+   * <p>This field will not be included in WebSocket events and omitted in the payload() function.</p>
    * <p><small>This should never be used if the invoice is created client-side (in the browser).</small></p>
    * @example
    * invoice.setAPIKey('https://t.me/yourname|SECURE_STRING')
@@ -191,8 +194,29 @@ class Invoice {
   }
 
   /**
+   * <p>Sets (Public) Data against the invoice.</p>
+   * @param {(string|object)} data If an object is passed, this will be converted to a string.
+   * @example
+   * // Using a string
+   * invoice.setData("https://your-site.com/some-url-to-redirect-to");
+   *
+   * // Using an object
+   * invoice.setData({
+   *  redirectURL: 'https://your-site.com/some-url-to-redirect-to'
+   * })
+   */
+  setData (data) {
+    if (typeof data === 'object') {
+      data = JSON.stringify(data)
+    }
+
+    this.data = data
+    return this
+  }
+
+  /**
    * <p>Sets Private Data against the invoice.</p>
-   * <p>Private data is stored under the 'options' object of an invoice and should never be exposed to the end user.</p>
+   * <p>This field will not be included in WebSocket events and omitted in the payload() function.</p>
    * @param {(string|object)} data If an object is passed, this will be converted to a string.
    * @example
    * // Using a string
@@ -254,10 +278,7 @@ class Invoice {
 
   /**
    * <p>Create the invoice.</p>
-   * @param {DOMElement} [container] DOM Element to render CashPay in
-   * @param {Object} [options] Options for container rendering
    * @example
-   * // Using default container
    * let invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container'))
    *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
@@ -295,9 +316,10 @@ class Invoice {
   }
 
   /**
-   * <p>Instantiate the invoice from a server-side endpoint.</p>
-   * @param {String} [endpoint] The endpoint to use
+   * <p>Load a created invoice from a server-side endpoint.</p>
+   * @param {String} endpoint The endpoint to use
    * @param {Object} [params] POST parameters to send to endpoint
+   * @param {Object} [option] Options to pass to axios.post
    * @example
    * // Using default container
    * const invoice = new CashPay.Invoice()
@@ -309,9 +331,9 @@ class Invoice {
    *   items: ['ITEM_001', 'ITEM_002']
    * })
    */
-  async createFrom (endpoint, params = {}) {
+  async createFrom (endpoint, params = {}, options = {}) {
     try {
-      const res = await axios.post(endpoint, params)
+      const res = await axios.post(endpoint, params, options)
       Object.assign(this, res.data)
       await this.create()
     } catch (err) {
@@ -352,7 +374,7 @@ class Invoice {
    * <p><small>The fields [apiKey, privateData, webhook, events] will be omitted from the payload</small></p>
    * @example
    * // Get JSON payload
-   * let payload = invoice.getPayload()
+   * let payload = invoice.payload()
    */
   payload () {
     return _.omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
@@ -411,7 +433,7 @@ class Invoice {
    * @private
    */
   _setupExpirationTimer () {
-    this._instance.expiryTimer = setInterval(() => {
+    const timerFunc = () => {
       const expires = new Date(this.expires * 1000).getTime()
       const now = new Date().getTime()
       const secondsRemaining = Math.round((expires - now) / 1000)
@@ -421,7 +443,10 @@ class Invoice {
       } else {
         this._instance.on.expired.forEach(cb => cb())
       }
-    }, 1000)
+    }
+
+    this._instance.expiryTimer = setInterval(timerFunc, 1000)
+    timerFunc()
   }
 
   /**
@@ -459,69 +484,74 @@ class Invoice {
 
     // Find container elements
     const subContainerEl = container.querySelector('.cashpay-container')
-    const qrCodeLinkEl = container.querySelector('.cashpay-qr-code-link')
-    const qrCodeEl = container.querySelector('.cashpay-qr-code')
+    const LinkEl = container.querySelector('.cashpay-link')
+    const svgContainerEl = container.querySelector('.cashpay-svg-container')
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
     const errorEl = container.querySelector('.cashpay-error')
 
     // Set loading SVG
-    subContainerEl.classList.add('loading')
-    qrCodeEl.innerHTML = loading
+    if (subContainerEl) subContainerEl.classList.add('loading')
+    if (svgContainerEl) svgContainerEl.innerHTML = loading
 
     // Trigger on invoice creation...
     this.on('created', async () => {
       // Remove loading class
-      subContainerEl.classList.remove('loading')
+      if (subContainerEl) subContainerEl.classList.remove('loading')
 
       // Render QR Code
-      qrCodeEl.innerHTML = await QRCode.toString(this.service.walletURI, {
-        type: 'svg',
-        margin: 0
-      })
+      if (svgContainerEl) {
+        svgContainerEl.classList.add('animate__zoomIn')
+        svgContainerEl.innerHTML = await QRCode.toString(this.service.walletURI, {
+          type: 'svg',
+          margin: 0
+        })
+      }
 
       // Set link on QR Code
-      qrCodeLinkEl.href = this.service.walletURI
+      if (LinkEl) LinkEl.href = this.service.walletURI
 
       // Set totals for BCH and Fiat
-      totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
+      if (totalFiatEl) totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
 
       // Show value in BCH
-      totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
+      if (totalBCHEl) totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
 
       // Show the subcontainer
-      subContainerEl.style.display = 'block'
+      if (subContainerEl) subContainerEl.style.display = 'block'
     })
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      subContainerEl.classList.add('broadcasted')
-      qrCodeEl.innerHTML = tick
-      qrCodeEl.classList.add('animate__pulse')
-      qrCodeLinkEl.removeAttribute('href')
-      expiresEl.innerText = ''
+      if (subContainerEl) subContainerEl.classList.add('broadcasted')
+      if (svgContainerEl) svgContainerEl.innerHTML = tick
+      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
+      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (LinkEl) LinkEl.removeAttribute('href')
+      if (expiresEl) expiresEl.innerText = ''
     })
 
     // Trigger on invoice expiry
     this.on('expired', () => {
-      subContainerEl.classList.add('expired')
-      qrCodeEl.innerHTML = cross
-      qrCodeEl.classList.add('animate__pulse')
-      qrCodeLinkEl.removeAttribute('href')
-      expiresEl.innerText = options.lang.invoiceHasExpired
+      if (subContainerEl) subContainerEl.classList.add('expired')
+      if (svgContainerEl) svgContainerEl.innerHTML = cross
+      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
+      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (LinkEl) LinkEl.removeAttribute('href')
+      if (expiresEl) expiresEl.innerText = options.lang.invoiceHasExpired
     })
 
     // Trigger each time expiration timer updates
     this.on('timer', (secondsRemaining) => {
       const minutes = Math.floor(secondsRemaining / 60)
       const seconds = secondsRemaining % 60
-      expiresEl.innerText = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
+      if (expiresEl) expiresEl.innerText = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
     })
 
     // Trigger on failed
     this.on('failed', (err) => {
-      errorEl.innerText = err.message
+      if (errorEl) errorEl.innerText = err.message
     })
 
     return this
