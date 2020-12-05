@@ -202,8 +202,9 @@ However, it can be useful for testing.
 // Create the invoice
 async function createInvoice() {
   let invoice = new CashPay.Invoice()
+    .intoContainer(document.getElementById('invoice-container'))
     .addAddress('bitcoincash:qz8dt7dlwkc5n4x9u6gclfwte8lr7n58gyavxt0vmp', "0.25USD")
-  await invoice.create(document.getElementById('invoice-container'))
+  await invoice.create()
 }
 
 createInvoice()
