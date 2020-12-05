@@ -36,7 +36,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -73,6 +73,8 @@ const cross = require('../statics/cross.svg')
   * Only use setters to modify the parameters of an invoice - do not set
   * values directly.&lt;/small>&lt;/p>
   *
+  * @property {String} id - ID of the invoice
+  *
   * @param {object} opts Options for invoice instance (use setters instead)
   * @param {object} invoice Invoice properties (use setters instead)
   * @example
@@ -97,7 +99,7 @@ const cross = require('../statics/cross.svg')
   *     console.log(event)
   *   })
   * await invoice.createFrom('https://your-endpoint-above', {
-  *   items: ['ITEM-001', 'ITEM_002'] 
+  *   items: ['ITEM-001', 'ITEM_002']
   * })
   *
   * // When you're done with invoice on client-side, it's important to call destroy.
@@ -231,6 +233,7 @@ class Invoice {
   /**
    * &lt;p>Sets the API Key&lt;/p>
    * &lt;p>An arbitrary API Key that can be used to later retrieve invoice information.&lt;/p>
+   * &lt;p>This field will not be included in WebSocket events and omitted in the payload() function.&lt;/p>
    * &lt;p>&lt;small>This should never be used if the invoice is created client-side (in the browser).&lt;/small>&lt;/p>
    * @example
    * invoice.setAPIKey('https://t.me/yourname|SECURE_STRING')
@@ -241,8 +244,29 @@ class Invoice {
   }
 
   /**
+   * &lt;p>Sets (Public) Data against the invoice.&lt;/p>
+   * @param {(string|object)} data If an object is passed, this will be converted to a string.
+   * @example
+   * // Using a string
+   * invoice.setData("https://your-site.com/some-url-to-redirect-to");
+   *
+   * // Using an object
+   * invoice.setData({
+   *  redirectURL: 'https://your-site.com/some-url-to-redirect-to'
+   * })
+   */
+  setData (data) {
+    if (typeof data === 'object') {
+      data = JSON.stringify(data)
+    }
+
+    this.data = data
+    return this
+  }
+
+  /**
    * &lt;p>Sets Private Data against the invoice.&lt;/p>
-   * &lt;p>Private data is stored under the 'options' object of an invoice and should never be exposed to the end user.&lt;/p>
+   * &lt;p>This field will not be included in WebSocket events and omitted in the payload() function.&lt;/p>
    * @param {(string|object)} data If an object is passed, this will be converted to a string.
    * @example
    * // Using a string
@@ -304,10 +328,7 @@ class Invoice {
 
   /**
    * &lt;p>Create the invoice.&lt;/p>
-   * @param {DOMElement} [container] DOM Element to render CashPay in
-   * @param {Object} [options] Options for container rendering
    * @example
-   * // Using default container
    * let invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container'))
    *   .addAddress('bitcoincash:qpfsrgdeq49fsjrg5qk4xqhswjl7g248950nzsrwvn', '1USD')
@@ -343,11 +364,12 @@ class Invoice {
       throw err
     }
   }
-  
+
   /**
-   * &lt;p>Instantiate the invoice from a server-side endpoint.&lt;/p>
-   * @param {String} [endpoint] The endpoint to use
-   * @param {Object} [params] POST parameters to send to endpoint 
+   * &lt;p>Load a created invoice from a server-side endpoint.&lt;/p>
+   * @param {String} endpoint The endpoint to use
+   * @param {Object} [params] POST parameters to send to endpoint
+   * @param {Object} [option] Options to pass to axios.post
    * @example
    * // Using default container
    * const invoice = new CashPay.Invoice()
@@ -359,9 +381,9 @@ class Invoice {
    *   items: ['ITEM_001', 'ITEM_002']
    * })
    */
-  async createFrom (endpoint, params = {}) {
+  async createFrom (endpoint, params = {}, options = {}) {
     try {
-      const res = await axios.post(endpoint, params)
+      const res = await axios.post(endpoint, params, options)
       Object.assign(this, res.data)
       await this.create()
     } catch (err) {
@@ -369,16 +391,16 @@ class Invoice {
       throw err
     }
   }
-  
+
   /**
    * &lt;p>Instantiate the invoice from an existing invoice.&lt;/p>
    * &lt;p>Similar to createFrom, but where you handle the AJAX request.&lt;/p>
-   * @param {Object} [params] POST parameters to send to endpoint 
+   * @param {Object} [params] POST parameters to send to endpoint
    * @example
    * const res = axios.post('https://api.your-site.com/request-invoice', {
    *   items: ['ITEM_001', 'ITEM_002']
    * })
-   * 
+   *
    * let invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container'))
    *   .on('broadcasted', e => {
@@ -402,7 +424,7 @@ class Invoice {
    * &lt;p>&lt;small>The fields [apiKey, privateData, webhook, events] will be omitted from the payload&lt;/small>&lt;/p>
    * @example
    * // Get JSON payload
-   * let payload = invoice.getPayload()
+   * let payload = invoice.payload()
    */
   payload () {
     return _.omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
@@ -461,7 +483,7 @@ class Invoice {
    * @private
    */
   _setupExpirationTimer () {
-    this._instance.expiryTimer = setInterval(() => {
+    const timerFunc = () => {
       const expires = new Date(this.expires * 1000).getTime()
       const now = new Date().getTime()
       const secondsRemaining = Math.round((expires - now) / 1000)
@@ -471,7 +493,10 @@ class Invoice {
       } else {
         this._instance.on.expired.forEach(cb => cb())
       }
-    }, 1000)
+    }
+
+    this._instance.expiryTimer = setInterval(timerFunc, 1000)
+    timerFunc()
   }
 
   /**
@@ -481,24 +506,24 @@ class Invoice {
    * @param {String} options.lang.expiresIn Text to use for Expires In
    * @param {String} options.lang.invoiceHasExpired Text to use when Invoice has expired
    * @example
-   * // No options 
+   * // No options
    * const invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container')
-   * 
+   *
    * // Change Invoice Expired Text for Captcha
    * const invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container', {
    *     lang: {
    *       invoiceHasExpired: 'Captcha has expired'
    *     }
-   *   }) 
+   *   })
    */
   intoContainer (container, options) {
     options = Object.assign({
       template: template,
       lang: {
         expiresIn: 'Expires in ',
-        invoiceHasExpired: 'Invoice has expired',
+        invoiceHasExpired: 'Invoice has expired'
       }
     }, options)
 
@@ -509,71 +534,76 @@ class Invoice {
 
     // Find container elements
     const subContainerEl = container.querySelector('.cashpay-container')
-    const qrCodeLinkEl = container.querySelector('.cashpay-qr-code-link')
-    const qrCodeEl = container.querySelector('.cashpay-qr-code')
+    const LinkEl = container.querySelector('.cashpay-link')
+    const svgContainerEl = container.querySelector('.cashpay-svg-container')
     const totalBCHEl = container.querySelector('.cashpay-total-bch')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
     const errorEl = container.querySelector('.cashpay-error')
 
     // Set loading SVG
-    subContainerEl.classList.add('loading')
-    qrCodeEl.innerHTML = loading
-    
+    if (subContainerEl) subContainerEl.classList.add('loading')
+    if (svgContainerEl) svgContainerEl.innerHTML = loading
+
     // Trigger on invoice creation...
     this.on('created', async () => {
       // Remove loading class
-      subContainerEl.classList.remove('loading')
-      
+      if (subContainerEl) subContainerEl.classList.remove('loading')
+
       // Render QR Code
-      qrCodeEl.innerHTML = await QRCode.toString(this.service.walletURI, {
-        type: 'svg',
-        margin: 0
-      })
+      if (svgContainerEl) {
+        svgContainerEl.classList.add('animate__zoomIn')
+        svgContainerEl.innerHTML = await QRCode.toString(this.service.walletURI, {
+          type: 'svg',
+          margin: 0
+        })
+      }
 
       // Set link on QR Code
-      qrCodeLinkEl.href = this.service.walletURI
+      if (LinkEl) LinkEl.href = this.service.walletURI
 
       // Set totals for BCH and Fiat
-      totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
+      if (totalFiatEl) totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
 
       // Show value in BCH
-      totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
+      if (totalBCHEl) totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
 
       // Show the subcontainer
-      subContainerEl.style.display = 'block'
+      if (subContainerEl) subContainerEl.style.display = 'block'
     })
 
     // Trigger on invoice broadcasted...
     this.on('broadcasted', () => {
-      subContainerEl.classList.add('broadcasted')
-      qrCodeEl.innerHTML = tick
-      qrCodeEl.classList.add('animate__pulse')
-      qrCodeLinkEl.removeAttribute('href')
-      expiresEl.innerText = ''
+      if (subContainerEl) subContainerEl.classList.add('broadcasted')
+      if (svgContainerEl) svgContainerEl.innerHTML = tick
+      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
+      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (LinkEl) LinkEl.removeAttribute('href')
+      if (expiresEl) expiresEl.innerText = ''
     })
 
     // Trigger on invoice expiry
     this.on('expired', () => {
-      subContainerEl.classList.add('expired')
-      qrCodeEl.innerHTML = cross
-      qrCodeEl.classList.add('animate__pulse')
-      qrCodeLinkEl.removeAttribute('href')
-      expiresEl.innerText = options.lang.invoiceHasExpired
+      if (subContainerEl) subContainerEl.classList.add('expired')
+      if (svgContainerEl) svgContainerEl.innerHTML = cross
+      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
+      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (LinkEl) LinkEl.removeAttribute('href')
+      if (expiresEl) expiresEl.innerText = options.lang.invoiceHasExpired
     })
 
     // Trigger each time expiration timer updates
     this.on('timer', (secondsRemaining) => {
       const minutes = Math.floor(secondsRemaining / 60)
       const seconds = secondsRemaining % 60
-      expiresEl.innerText = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
+      if (expiresEl) expiresEl.innerText = `Expires in ${minutes}:${seconds.toString().padStart(2, '0')}`
     })
 
     // Trigger on failed
     this.on('failed', (err) => {
-      errorEl.innerText = err.message
+      if (errorEl) errorEl.innerText = err.message
     })
-    
+
     return this
   }
 }
