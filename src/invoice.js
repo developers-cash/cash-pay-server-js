@@ -486,7 +486,7 @@ class Invoice {
     const subContainerEl = container.querySelector('.cashpay-container')
     const LinkEl = container.querySelector('.cashpay-link')
     const svgContainerEl = container.querySelector('.cashpay-svg-container')
-    const totalBCHEl = container.querySelector('.cashpay-total-bch')
+    const totalNativeEl = container.querySelector('.cashpay-total-native')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
     const errorEl = container.querySelector('.cashpay-error')
@@ -516,7 +516,7 @@ class Invoice {
       if (totalFiatEl) totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
 
       // Show value in BCH
-      if (totalBCHEl) totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
+      if (totalNativeEl) totalNativeEl.innerText = `${this.totals.nativeTotal / 100000000}${this.currency}`
 
       // Show the subcontainer
       if (subContainerEl) subContainerEl.style.display = 'block'

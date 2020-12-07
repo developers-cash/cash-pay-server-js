@@ -7,7 +7,7 @@
  * // Use a self-hosted server
  * CashPay.config.options.endpoint = 'https://cash-pay.self-hosted.com'
  *
- * // Show/calculate totals in Australian dollars
+ * // Show totals in Australian dollars
  * CashPay.config.invoice.userCurrency = 'AUD'
  *
  * // Newly created invoices will use the globals given above
@@ -54,6 +54,7 @@ class Config {
      * }
      */
     this.invoice = {
+      currency: 'BCH',
       network: 'main',
       outputs: [],
       userCurrency: 'USD',
