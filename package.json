@@ -3,6 +3,7 @@
   "version": "0.11.0",
   "description": "A Client-side and Server-side library for integrating with Cash Pay Microservice instances.",
   "main": "lib/index.js",
+  "module": "lib/module.js",
   "files": [
     "lib/**/*",
     "dist/**/*"
@@ -10,8 +11,8 @@
   "sideEffects": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./webpack.browser.js && npx webpack --config ./webpack.node.js",
-    "build-dev": "webpack --config ./webpack.browser.js --mode development && npx webpack --config ./webpack.node.js --mode development",
+    "build": "webpack --config ./webpack.browser.js && webpack --config ./webpack.commonjs.js && webpack --config ./webpack.module.js",
+    "build-dev": "webpack --config ./webpack.browser.js --mode development && npx webpack --config ./webpack.commonjs.js --mode development && npx webpack --config ./webpack.module.js --mode development",
     "lint": "eslint src",
     "format": "eslint src --fix",
     "prepare": "npm run build",

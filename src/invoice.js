@@ -1,14 +1,14 @@
-const config = require('./config')
+import config from './config'
 
-const _ = require('lodash')
-const axios = require('axios')
-const SocketIO = require('socket.io-client')
-const QRCode = require('qrcode')
+import { cloneDeep, omit } from 'lodash'
+import axios from 'axios'
+import SocketIO from 'socket.io-client'
+import QRCode from 'qrcode'
 
-const template = require('../statics/template.html')
-const loading = require('../statics/loading.svg')
-const tick = require('../statics/tick.svg')
-const cross = require('../statics/cross.svg')
+import template from '../statics/template.html'
+import loading from '../statics/loading.svg'
+import tick from '../statics/tick.svg'
+import cross from '../statics/cross.svg'
 
 /**
   * <p>A Cash Payment Server Invoice</p>
@@ -60,8 +60,8 @@ class Invoice {
   constructor (opts = {}, invoice = {}) {
     this._instance = {}
 
-    Object.assign(this, _.cloneDeep(config.invoice), invoice)
-    Object.assign(this._instance, _.cloneDeep(config.options), opts)
+    Object.assign(this, cloneDeep(config.invoice), invoice)
+    Object.assign(this._instance, cloneDeep(config.options), opts)
   }
 
   /**
@@ -290,7 +290,7 @@ class Invoice {
   async create () {
     try {
       if (!this._id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
+        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
@@ -377,7 +377,7 @@ class Invoice {
    * let payload = invoice.payload()
    */
   payload () {
-    return _.omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
+    return omit(this, '_instance', 'apiKey', 'privateData', 'webhook', 'events')
   }
 
   /**
@@ -413,12 +413,12 @@ class Invoice {
     })
 
     this._instance.socket.on('requested', (msg) => {
-      Object.assign(this, _.omit(msg.invoice, 'id'))
+      Object.assign(this, omit(msg.invoice, 'id'))
       this._instance.on.requested.forEach(cb => cb(msg))
     })
 
     this._instance.socket.on('broadcasted', (msg) => {
-      Object.assign(this, _.omit(msg.invoice, 'id'))
+      Object.assign(this, omit(msg.invoice, 'id'))
       this._instance.on.broadcasted.forEach(cb => cb(msg))
     })
 

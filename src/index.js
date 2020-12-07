@@ -1,6 +1,6 @@
-const config = require('./config')
-const Invoice = require('./invoice')
-const Signatures = require('./signatures')
+import config from './config'
+import Invoice from './invoice'
+import Signatures from './signatures'
 
 module.exports = {
   config: config,
