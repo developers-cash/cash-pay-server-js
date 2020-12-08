@@ -63,3 +63,5 @@ typings/
 # Distributable files
 dist
 lib
+server.js
+browser.js

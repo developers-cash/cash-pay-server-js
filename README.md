@@ -71,7 +71,8 @@ Render the created invoice on your client-side
 ```html
 <!-- head -->
 <script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
-<!-- Or install via NPM -->
+<!-- Or if using NPM, use the browser optimized version -->
+<!-- const CashPay = require('@developers.cash/cash-pay-server-js/browser')
 
 <!-- body -->
 <div id="invoice-container"></div>
@@ -194,6 +195,8 @@ However, it can be useful for testing.
 ```html
 <!-- head -->
 <script src="https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js"></script>
+<!-- Or if using NPM, use the browser optimized version -->
+<!-- const CashPay = require('@developers.cash/cash-pay-server-js/browser')
 
 <!-- body -->
 <div id="invoice-container"></div>
