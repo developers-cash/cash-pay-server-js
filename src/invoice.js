@@ -290,7 +290,7 @@ class Invoice {
   async create () {
     try {
       if (!this._id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
+        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', _.omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
