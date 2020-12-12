@@ -128,9 +128,6 @@ Webhooks are also available. Using Webhooks instead of the Websocket Events gene
 over passing Websocket events to the server-side, but are also more difficult to implement as they require
 a public facing URL.
 
-
-
-
 ```javascript
 async function requestInvoice(req, res) {
   // ...
@@ -234,7 +231,7 @@ invoice.setMerchantData(JSON.stringify({
 // Set Public Data (will be available in WebSocket events - i.e. not private)
 invoice.setData("InvoiceID:1000") // String
 invoice.setData({
-  redirectURL: '/download/someSecureFile.mp4'
+  redirectURL: '/gated-content/some-page'
 })
 
 // Set Private Data (only accessible through Admin and Webhooks)

@@ -165,6 +165,18 @@ class Invoice {
   }
 
   /**
+   * Sets a BIP70/JPP memo to show AFTER payment
+   * @param {string} memoPaid Memo text
+   * @example
+   * // Memos are not supported by all wallets
+   * invoice.setMemoPaid('Thank you for your payment')
+   */
+  setMemoPaid (memoPaid) {
+    this.memoPaid = memoPaid
+    return this
+  }
+
+  /**
    * <p>Sets Merchant Data associated with invoice</p>
    * <p><strong>This must be Base64 encoded</strong></p>
    * @param {string} data Base64 encoded string
@@ -502,7 +514,7 @@ class Invoice {
 
       // Render QR Code
       if (svgContainerEl) {
-        svgContainerEl.classList.add('animate__zoomIn')
+        svgContainerEl.classList.add('cashpay-animation-zoom-in')
         svgContainerEl.innerHTML = await QRCode.toString(this.service.walletURI, {
           type: 'svg',
           margin: 0
@@ -526,8 +538,8 @@ class Invoice {
     this.on('broadcasted', () => {
       if (subContainerEl) subContainerEl.classList.add('broadcasted')
       if (svgContainerEl) svgContainerEl.innerHTML = tick
-      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
-      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (svgContainerEl) svgContainerEl.classList.remove('cashpay-animation-zoom-in')
+      if (svgContainerEl) svgContainerEl.classList.add('cashpay-animation-pulse')
       if (LinkEl) LinkEl.removeAttribute('href')
       if (expiresEl) expiresEl.innerText = ''
     })
@@ -536,8 +548,8 @@ class Invoice {
     this.on('expired', () => {
       if (subContainerEl) subContainerEl.classList.add('expired')
       if (svgContainerEl) svgContainerEl.innerHTML = cross
-      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
-      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (svgContainerEl) svgContainerEl.classList.remove('cashpay-animation-zoom-in')
+      if (svgContainerEl) svgContainerEl.classList.add('cashpay-animation-pulse')
       if (LinkEl) LinkEl.removeAttribute('href')
       if (expiresEl) expiresEl.innerText = options.lang.invoiceHasExpired
     })

@@ -20,13 +20,9 @@
   }
   
   .cashpay-container.loading .cashpay-svg-container svg {
-    -webkit-animation: cashpay-spin 4s linear infinite;
-    -moz-animation: cashpay-spin 4s linear infinite;
     animation: cashpay-spin 4s linear infinite;
   }
   
-  @-moz-keyframes cashpay-spin { 100% { -moz-transform: rotate(360deg); } }
-  @-webkit-keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); } }
   @keyframes cashpay-spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
   
   .cashpay-container.expired .cashpay-svg-container, .cashpay-container.broadcasted .cashpay-svg-container {
@@ -60,12 +56,51 @@
     font-weight: bold;
     text-align: center;
   }
+  
+  /* Animations */
+  .cashpay-animation-zoom-in {
+    animation-name: cashpay-zoom-in;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+  }
+  
+  .cashpay-animation-pulse {
+    animation-name: cashpay-pulse;
+    animation-timing-function: ease-in-out;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+  }
+  
+  @keyframes cashpay-zoom-in {
+    from {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes cashpay-pulse {
+    from {
+      transform: scale3d(1, 1, 1);
+    }
+
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05);
+    }
+
+    to {
+      transform: scale3d(1, 1, 1);
+    }
+  }
 </style>
 
-<div class="cashpay-container animate__animated animate__fadeIn">
+<div class="cashpay-container">
   <div>
     <a class="cashpay-link" title="Click to open in wallet">
-      <div class="cashpay-svg-container animate__animated"></div>
+      <div class="cashpay-svg-container"></div>
     </a>
   </div>
   <div class="cashpay-below">
