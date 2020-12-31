@@ -86,8 +86,6 @@ async function fetchInvoice() {
       axios.post('https://api.yoursite.com/invoice-paid', {
         event: e
       })
-    
-      invoice.destroy()
     })
 
   // Fetch the invoice that we created on the server-side

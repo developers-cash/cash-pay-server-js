@@ -51,10 +51,6 @@ const cross = require('../statics/cross.svg')
   * await invoice.createFrom('https://your-endpoint-above', {
   *   items: ['ITEM-001', 'ITEM_002']
   * })
-  *
-  * // When you're done with invoice on client-side, it's important to call destroy.
-  * // Otherwise, you may end up with memory-leaks.
-  * invoice.destroy()
   */
 class Invoice {
   constructor (opts = {}, invoice = {}) {
@@ -137,6 +133,18 @@ class Invoice {
       amount: amount
     })
 
+    return this
+  }
+
+  /**
+   * Set network
+   * @param {string} network Network to use
+   * @example
+   * // Use testnet
+   * invoice.setNetwork('test')
+   */
+  setNetwork (network) {
+    this.network = network
     return this
   }
 
@@ -290,6 +298,8 @@ class Invoice {
 
   /**
    * <p>Create the invoice.</p>
+   * <p>Browser Environment: Websocket and Expiry timers WILL be instantiated.</p>
+   * <p>NodeJS Enviroment: Websocket and Expiry timers WILL NOT be instantiated.</p>
    * @example
    * let invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container'))
@@ -395,8 +405,8 @@ class Invoice {
   /**
    * <p>Destroy the invoice instance.</p>
    * <p>This function should be used to clear all listeners from the invoice.</p>
-   * <p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
-   * <p><small>Note this does not destroy the container, but the timers/websocket listener</small></p>
+   * <p>You will need to call this manually if you are not using the OOTB intoContainer function.</p>
+   * <p><small>Note this does not destroy the container itself, but the timers/websocket listener.</small></p>
    * @example
    * // Destroy the invoice to prevent memory-leaks/dangling references
    * invoice.destroy()
@@ -464,9 +474,11 @@ class Invoice {
   /**
    * <p>Load the invoice into a DOM container.</p>
    * <p>If the DOM element is empty, default template will be used.</p>
+   * <p>Note: If container is removed from DOM, invoice listeners will be destroyed by default. See destroyOnRemoved param in options.</p>
    * @param {DOMElement} container Container to load into
    * @param {String} options.lang.expiresIn Text to use for Expires In
    * @param {String} options.lang.invoiceHasExpired Text to use when Invoice has expired
+   * @param {Boolean} [options.destroyOnRemoved=true] Destroy invoice listeners when DOM element removed
    * @example
    * // No options
    * const invoice = new CashPay.Invoice()
@@ -486,7 +498,8 @@ class Invoice {
       lang: {
         expiresIn: 'Expires in ',
         invoiceHasExpired: 'Invoice has expired'
-      }
+      },
+      destroyOnRemoved: true
     }, options)
 
     // Inject template (otherwise, assume it's already there)
@@ -565,6 +578,17 @@ class Invoice {
     this.on('failed', (err) => {
       if (errorEl) errorEl.innerText = err.message
     })
+
+    // If DOM element is removed, call destroy
+    if (options.destroyOnRemoved) {
+      const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(container)) {
+          observer.disconnect()
+          this.destroy()
+        }
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
+    }
 
     return this
   }
