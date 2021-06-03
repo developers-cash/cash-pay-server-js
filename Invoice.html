@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMemoPaid">setMemoPaid</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setNetwork">setNetwork</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -80,7 +80,7 @@ values directly.</small></p></div>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line59">line 59</a></code>
+                <code><a href="invoice.js.html#line55">line 55</a></code>
             </div>
             
         </h4>
@@ -299,11 +299,7 @@ let invoice = new CashPay.Invoice()
   })
 await invoice.createFrom('https://your-endpoint-above', {
   items: ['ITEM-001', 'ITEM_002']
-})
-
-// When you're done with invoice on client-side, it's important to call destroy.
-// Otherwise, you may end up with memory-leaks.
-invoice.destroy()</code></pre>
+})</code></pre>
 
     
 
@@ -342,7 +338,7 @@ invoice.destroy()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line116">line 116</a></code>
+                <code><a href="invoice.js.html#line112">line 112</a></code>
             </div>
             
         </h4>
@@ -516,7 +512,7 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line134">line 134</a></code>
+                <code><a href="invoice.js.html#line130">line 130</a></code>
             </div>
             
         </h4>
@@ -717,7 +713,7 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line290">line 290</a></code>
+                <code><a href="invoice.js.html#line312">line 312</a></code>
             </div>
             
         </h4>
@@ -730,6 +726,8 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
     
     <div class="description">
         <p>Create the invoice.</p>
+<p>Browser Environment: Websocket and Expiry timers WILL be instantiated.</p>
+<p>NodeJS Enviroment: Websocket and Expiry timers WILL NOT be instantiated.</p>
     </div>
     
 
@@ -817,7 +815,7 @@ await invoice.create()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line334">line 334</a></code>
+                <code><a href="invoice.js.html#line356">line 356</a></code>
             </div>
             
         </h4>
@@ -1045,7 +1043,7 @@ await invoice.createFrom('https://api.your-site.com/request-invoice', {
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line361">line 361</a></code>
+                <code><a href="invoice.js.html#line383">line 383</a></code>
             </div>
             
         </h4>
@@ -1211,7 +1209,7 @@ await invoice.createFromExisting(res.data.invoice)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line392">line 392</a></code>
+                <code><a href="invoice.js.html#line414">line 414</a></code>
             </div>
             
         </h4>
@@ -1225,8 +1223,8 @@ await invoice.createFromExisting(res.data.invoice)</code></pre>
     <div class="description">
         <p>Destroy the invoice instance.</p>
 <p>This function should be used to clear all listeners from the invoice.</p>
-<p>If this is not called, you will likely end up with dangling references that might cause funky behavior.</p>
-<p><small>Note this does not destroy the container, but the timers/websocket listener</small></p>
+<p>You will need to call this manually if you are not using the OOTB intoContainer function.</p>
+<p><small>Note this does not destroy the container itself, but the timers/websocket listener.</small></p>
     </div>
     
 
@@ -1309,7 +1307,7 @@ invoice.destroy()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line471">line 471</a></code>
+                <code><a href="invoice.js.html#line495">line 495</a></code>
             </div>
             
         </h4>
@@ -1323,6 +1321,7 @@ invoice.destroy()</code></pre>
     <div class="description">
         <p>Load the invoice into a DOM container.</p>
 <p>If the DOM element is empty, default template will be used.</p>
+<p>Note: If container is removed from DOM, invoice listeners will be destroyed by default. See destroyOnRemoved param in options.</p>
     </div>
     
 
@@ -1346,7 +1345,11 @@ invoice.destroy()</code></pre>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1371,7 +1374,19 @@ invoice.destroy()</code></pre>
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Container to load into</td>
@@ -1394,7 +1409,19 @@ invoice.destroy()</code></pre>
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Text to use for Expires In</td>
@@ -1417,10 +1444,61 @@ invoice.destroy()</code></pre>
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Text to use when Invoice has expired</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.destroyOnRemoved</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">Destroy invoice listeners when DOM element removed</td>
         </tr>
 
     
@@ -1510,7 +1588,7 @@ const invoice = new CashPay.Invoice()
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line95">line 95</a></code>
+                <code><a href="invoice.js.html#line91">line 91</a></code>
             </div>
             
         </h4>
@@ -1696,7 +1774,7 @@ let invoice = new CashPay.Invoice()
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line379">line 379</a></code>
+                <code><a href="invoice.js.html#line401">line 401</a></code>
             </div>
             
         </h4>
@@ -1793,7 +1871,7 @@ let payload = invoice.payload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line191">line 191</a></code>
+                <code><a href="invoice.js.html#line211">line 211</a></code>
             </div>
             
         </h4>
@@ -1890,7 +1968,7 @@ let payload = invoice.payload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line208">line 208</a></code>
+                <code><a href="invoice.js.html#line228">line 228</a></code>
             </div>
             
         </h4>
@@ -2043,7 +2121,7 @@ invoice.setData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line150">line 150</a></code>
+                <code><a href="invoice.js.html#line158">line 158</a></code>
             </div>
             
         </h4>
@@ -2188,7 +2266,7 @@ invoice.setExpires(15 * 60)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line162">line 162</a></code>
+                <code><a href="invoice.js.html#line170">line 170</a></code>
             </div>
             
         </h4>
@@ -2326,6 +2404,151 @@ invoice.setMemo("Payment to YOUR_SERVICE_NAME")</code></pre>
 
 <dt>
     
+        <h4 class="name" id="setMemoPaid">
+            
+                <span class="type-signature"></span>setMemoPaid<span class="signature">(memoPaid)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line182">line 182</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Sets a BIP70/JPP memo to show AFTER payment
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>memoPaid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Memo text</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// Memos are not supported by all wallets
+invoice.setMemoPaid('Thank you for your payment')</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
         <h4 class="name" id="setMerchantData">
             
                 <span class="type-signature"></span>setMerchantData<span class="signature">(data)</span><span class="type-signature"></span>
@@ -2333,7 +2556,7 @@ invoice.setMemo("Payment to YOUR_SERVICE_NAME")</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line178">line 178</a></code>
+                <code><a href="invoice.js.html#line198">line 198</a></code>
             </div>
             
         </h4>
@@ -2475,6 +2698,151 @@ invoice.setMerchantData(btoa('INVOICE_001'))</code></pre>
 
 <dt>
     
+        <h4 class="name" id="setNetwork">
+            
+                <span class="type-signature"></span>setNetwork<span class="signature">(network)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="invoice.js.html">invoice.js</a></code>,
+                <code><a href="invoice.js.html#line146">line 146</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Set network
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>network</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Network to use</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>// Use testnet
+invoice.setNetwork('test')</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
         <h4 class="name" id="setPrivateData">
             
                 <span class="type-signature"></span>setPrivateData<span class="signature">(data)</span><span class="type-signature"></span>
@@ -2482,7 +2850,7 @@ invoice.setMerchantData(btoa('INVOICE_001'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line230">line 230</a></code>
+                <code><a href="invoice.js.html#line250">line 250</a></code>
             </div>
             
         </h4>
@@ -2636,7 +3004,7 @@ invoice.setPrivateData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line246">line 246</a></code>
+                <code><a href="invoice.js.html#line266">line 266</a></code>
             </div>
             
         </h4>
@@ -2781,7 +3149,7 @@ invoice.setUserCurrency('AUD')</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line267">line 267</a></code>
+                <code><a href="invoice.js.html#line287">line 287</a></code>
             </div>
             
         </h4>

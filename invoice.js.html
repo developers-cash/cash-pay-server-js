@@ -36,7 +36,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMemoPaid">setMemoPaid</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setNetwork">setNetwork</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -101,10 +101,6 @@ const cross = require('../statics/cross.svg')
   * await invoice.createFrom('https://your-endpoint-above', {
   *   items: ['ITEM-001', 'ITEM_002']
   * })
-  *
-  * // When you're done with invoice on client-side, it's important to call destroy.
-  * // Otherwise, you may end up with memory-leaks.
-  * invoice.destroy()
   */
 class Invoice {
   constructor (opts = {}, invoice = {}) {
@@ -191,6 +187,18 @@ class Invoice {
   }
 
   /**
+   * Set network
+   * @param {string} network Network to use
+   * @example
+   * // Use testnet
+   * invoice.setNetwork('test')
+   */
+  setNetwork (network) {
+    this.network = network
+    return this
+  }
+
+  /**
    * Set expiration time
    * @param {number} seconds Seconds from time of creation that Payment Request expires
    * @example
@@ -211,6 +219,18 @@ class Invoice {
    */
   setMemo (memo) {
     this.memo = memo
+    return this
+  }
+
+  /**
+   * Sets a BIP70/JPP memo to show AFTER payment
+   * @param {string} memoPaid Memo text
+   * @example
+   * // Memos are not supported by all wallets
+   * invoice.setMemoPaid('Thank you for your payment')
+   */
+  setMemoPaid (memoPaid) {
+    this.memoPaid = memoPaid
     return this
   }
 
@@ -328,6 +348,8 @@ class Invoice {
 
   /**
    * &lt;p>Create the invoice.&lt;/p>
+   * &lt;p>Browser Environment: Websocket and Expiry timers WILL be instantiated.&lt;/p>
+   * &lt;p>NodeJS Enviroment: Websocket and Expiry timers WILL NOT be instantiated.&lt;/p>
    * @example
    * let invoice = new CashPay.Invoice()
    *   .intoContainer(document.getElementById('invoice-container'))
@@ -340,7 +362,7 @@ class Invoice {
   async create () {
     try {
       if (!this._id) {
-        const invoiceRes = await axios.post(this._instance.endpoint + '/bch/create', _.omit(this, '_instance'))
+        const invoiceRes = await axios.post(this._instance.endpoint + '/invoice/create', _.omit(this, '_instance'))
         Object.assign(this, invoiceRes.data)
       }
 
@@ -433,8 +455,8 @@ class Invoice {
   /**
    * &lt;p>Destroy the invoice instance.&lt;/p>
    * &lt;p>This function should be used to clear all listeners from the invoice.&lt;/p>
-   * &lt;p>If this is not called, you will likely end up with dangling references that might cause funky behavior.&lt;/p>
-   * &lt;p>&lt;small>Note this does not destroy the container, but the timers/websocket listener&lt;/small>&lt;/p>
+   * &lt;p>You will need to call this manually if you are not using the OOTB intoContainer function.&lt;/p>
+   * &lt;p>&lt;small>Note this does not destroy the container itself, but the timers/websocket listener.&lt;/small>&lt;/p>
    * @example
    * // Destroy the invoice to prevent memory-leaks/dangling references
    * invoice.destroy()
@@ -502,9 +524,11 @@ class Invoice {
   /**
    * &lt;p>Load the invoice into a DOM container.&lt;/p>
    * &lt;p>If the DOM element is empty, default template will be used.&lt;/p>
+   * &lt;p>Note: If container is removed from DOM, invoice listeners will be destroyed by default. See destroyOnRemoved param in options.&lt;/p>
    * @param {DOMElement} container Container to load into
    * @param {String} options.lang.expiresIn Text to use for Expires In
    * @param {String} options.lang.invoiceHasExpired Text to use when Invoice has expired
+   * @param {Boolean} [options.destroyOnRemoved=true] Destroy invoice listeners when DOM element removed
    * @example
    * // No options
    * const invoice = new CashPay.Invoice()
@@ -524,7 +548,8 @@ class Invoice {
       lang: {
         expiresIn: 'Expires in ',
         invoiceHasExpired: 'Invoice has expired'
-      }
+      },
+      destroyOnRemoved: true
     }, options)
 
     // Inject template (otherwise, assume it's already there)
@@ -536,7 +561,7 @@ class Invoice {
     const subContainerEl = container.querySelector('.cashpay-container')
     const LinkEl = container.querySelector('.cashpay-link')
     const svgContainerEl = container.querySelector('.cashpay-svg-container')
-    const totalBCHEl = container.querySelector('.cashpay-total-bch')
+    const totalNativeEl = container.querySelector('.cashpay-total-native')
     const totalFiatEl = container.querySelector('.cashpay-total-fiat')
     const expiresEl = container.querySelector('.cashpay-expires')
     const errorEl = container.querySelector('.cashpay-error')
@@ -552,7 +577,7 @@ class Invoice {
 
       // Render QR Code
       if (svgContainerEl) {
-        svgContainerEl.classList.add('animate__zoomIn')
+        svgContainerEl.classList.add('cashpay-animation-zoom-in')
         svgContainerEl.innerHTML = await QRCode.toString(this.service.walletURI, {
           type: 'svg',
           margin: 0
@@ -566,7 +591,7 @@ class Invoice {
       if (totalFiatEl) totalFiatEl.innerText = `${this.totals.userCurrencyTotal}${this.userCurrency}`
 
       // Show value in BCH
-      if (totalBCHEl) totalBCHEl.innerText = `${this.totals.satoshiTotal / 100000000}BCH`
+      if (totalNativeEl) totalNativeEl.innerText = `${this.totals.nativeTotal / 100000000}${this.currency}`
 
       // Show the subcontainer
       if (subContainerEl) subContainerEl.style.display = 'block'
@@ -576,8 +601,8 @@ class Invoice {
     this.on('broadcasted', () => {
       if (subContainerEl) subContainerEl.classList.add('broadcasted')
       if (svgContainerEl) svgContainerEl.innerHTML = tick
-      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
-      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (svgContainerEl) svgContainerEl.classList.remove('cashpay-animation-zoom-in')
+      if (svgContainerEl) svgContainerEl.classList.add('cashpay-animation-pulse')
       if (LinkEl) LinkEl.removeAttribute('href')
       if (expiresEl) expiresEl.innerText = ''
     })
@@ -586,8 +611,8 @@ class Invoice {
     this.on('expired', () => {
       if (subContainerEl) subContainerEl.classList.add('expired')
       if (svgContainerEl) svgContainerEl.innerHTML = cross
-      if (svgContainerEl) svgContainerEl.classList.remove('animate__zoomIn')
-      if (svgContainerEl) svgContainerEl.classList.add('animate__pulse')
+      if (svgContainerEl) svgContainerEl.classList.remove('cashpay-animation-zoom-in')
+      if (svgContainerEl) svgContainerEl.classList.add('cashpay-animation-pulse')
       if (LinkEl) LinkEl.removeAttribute('href')
       if (expiresEl) expiresEl.innerText = options.lang.invoiceHasExpired
     })
@@ -603,6 +628,17 @@ class Invoice {
     this.on('failed', (err) => {
       if (errorEl) errorEl.innerText = err.message
     })
+
+    // If DOM element is removed, call destroy
+    if (options.destroyOnRemoved) {
+      const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(container)) {
+          observer.disconnect()
+          this.destroy()
+        }
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
+    }
 
     return this
   }

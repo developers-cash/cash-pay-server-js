@@ -34,7 +34,7 @@
         <ul></ul>
     </div>
     
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
+    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Config.html">Config</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Config_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Config.html#invoice">invoice</a></li><li><a href="Config.html#options">options</a></li></ul></div></li><li><a href="Invoice.html">Invoice</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Invoice_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Invoice.html#addAddress">addAddress</a></li><li><a href="Invoice.html#addOutput">addOutput</a></li><li><a href="Invoice.html#create">create</a></li><li><a href="Invoice.html#createFrom">createFrom</a></li><li><a href="Invoice.html#createFromExisting">createFromExisting</a></li><li><a href="Invoice.html#destroy">destroy</a></li><li><a href="Invoice.html#intoContainer">intoContainer</a></li><li><a href="Invoice.html#on">on</a></li><li><a href="Invoice.html#payload">payload</a></li><li><a href="Invoice.html#setAPIKey">setAPIKey</a></li><li><a href="Invoice.html#setData">setData</a></li><li><a href="Invoice.html#setExpires">setExpires</a></li><li><a href="Invoice.html#setMemo">setMemo</a></li><li><a href="Invoice.html#setMemoPaid">setMemoPaid</a></li><li><a href="Invoice.html#setMerchantData">setMerchantData</a></li><li><a href="Invoice.html#setNetwork">setNetwork</a></li><li><a href="Invoice.html#setPrivateData">setPrivateData</a></li><li><a href="Invoice.html#setUserCurrency">setUserCurrency</a></li><li><a href="Invoice.html#setWebhook">setWebhook</a></li></ul></div></li><li><a href="Signatures.html">Signatures</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Signatures_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Signatures.html#.refreshKeys">refreshKeys</a></li><li><a href="Signatures.html#.verifyEvent">verifyEvent</a></li><li><a href="Signatures.html#.verifyWebhook">verifyWebhook</a></li></ul></div></li></ul></div>
 </nav>
 <div id="resizer"></div>
 
@@ -59,6 +59,19 @@
     <section>
         <article class="readme"><h1>Cash-Pay-Server-JS</h1>
 <p>Javascript/Node library for use with Cash Pay Server.</p>
+<p>CashPayServer is a self-hostable NodeJS micro-service that can be used to handle BIP70 and JSON Payment Protocol invoices for Bitcoin Cash (BCH). This allows services to receive payments in BCH and attach arbitrary information to each transaction (e.g. Invoice Numbers, Order Details, etc).</p>
+<p><a href="https://codepen.io/jimtendo/pen/vYNbEVO">CodePen Client-side Example</a></p>
+<p><img src="./cash-pay-server-js.gif" alt="CodePen Example" title="CodePen Example"></p>
+<p>Features:</p>
+<ul>
+<li>BIP70 and JSON Payment Protocol Support</li>
+<li>Default template renders in <code>&lt;div&gt;</code> container for easy integration (custom templates supported)</li>
+<li>Websocket notifications (handle events on the client-side in real-time)</li>
+<li>Webhook support (handle events in the backend - e.g. <code>broadcasted</code>, <code>confirmed</code>)</li>
+<li>Exchange Rate calculation for most currencies (using Coinbase Exchange API)</li>
+<li>OP_RETURN and custom script support via <code>addOutput</code> (BIP70 only)</li>
+<li>Admin/Debugging Dashboard (https://admin.v1.pay.infra.cash/)</li>
+</ul>
 <p>Documentation: <a href="https://developers-cash.github.io/cash-pay-server-js/">https://developers-cash.github.io/cash-pay-server-js/</a></p>
 <h2>Quick Start</h2>
 <p>Include the <code>cash-pay-server-js</code> NPM package in your project.</p>
@@ -68,7 +81,7 @@
 <pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
 </code></pre>
 <p>Server-side Code for creating and marking as paid:</p>
-<pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers-cash/cash-pay-server-js')
+<pre class="prettyprint source lang-javascript"><code>const CashPay = require('@developers.cash/cash-pay-server-js')
 
 // ...
 
@@ -114,7 +127,8 @@ async function invoicePaid(req, res) {
 <p>Render the created invoice on your client-side</p>
 <pre class="prettyprint source lang-html"><code>&lt;!-- head -->
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
-&lt;!-- Or install via NPM -->
+&lt;!-- Or if using NPM, use the browser optimized version -->
+&lt;!-- const CashPay = require('@developers.cash/cash-pay-server-js/browser')
 
 &lt;!-- body -->
 &lt;div id=&quot;invoice-container&quot;>&lt;/div>
@@ -128,8 +142,6 @@ async function fetchInvoice() {
       axios.post('https://api.yoursite.com/invoice-paid', {
         event: e
       })
-    
-      invoice.destroy()
     })
 
   // Fetch the invoice that we created on the server-side
@@ -216,6 +228,8 @@ CashPay.config.options.endpoint = 'https://pay.your-instance.com'
 <p>However, it can be useful for testing.</p>
 <pre class="prettyprint source lang-html"><code>&lt;!-- head -->
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@developers.cash/cash-pay-server-js/dist/cashpay.min.js&quot;>&lt;/script>
+&lt;!-- Or if using NPM, use the browser optimized version -->
+&lt;!-- const CashPay = require('@developers.cash/cash-pay-server-js/browser')
 
 &lt;!-- body -->
 &lt;div id=&quot;invoice-container&quot;>&lt;/div>
@@ -250,7 +264,7 @@ invoice.setMerchantData(JSON.stringify({
 // Set Public Data (will be available in WebSocket events - i.e. not private)
 invoice.setData(&quot;InvoiceID:1000&quot;) // String
 invoice.setData({
-  redirectURL: '/download/someSecureFile.mp4'
+  redirectURL: '/gated-content/some-page'
 })
 
 // Set Private Data (only accessible through Admin and Webhooks)
