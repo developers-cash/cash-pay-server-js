@@ -3,6 +3,22 @@
 
 Javascript/Node library for use with Cash Pay Server.
 
+CashPayServer is a self-hostable NodeJS micro-service that can be used to handle BIP70 and JSON Payment Protocol invoices for Bitcoin Cash (BCH). This allows services to receive payments in BCH and attach arbitrary information to each transaction (e.g. Invoice Numbers, Order Details, etc).
+
+[CodePen Client-side Example](https://codepen.io/jimtendo/pen/vYNbEVO)
+
+![CodePen Example](./cash-pay-server-js.gif "CodePen Example")
+
+Features:
+
+- BIP70 and JSON Payment Protocol Support
+- Default template renders in `<div>` container for easy integration (custom templates supported)
+- Websocket notifications (handle events on the client-side in real-time)
+- Webhook support (handle events in the backend - e.g. `broadcasted`, `confirmed`)
+- Exchange Rate calculation for most currencies (using Coinbase Exchange API)
+- OP_RETURN and custom script support via `addOutput` (BIP70 only)
+- Admin/Debugging Dashboard (https://admin.v1.pay.infra.cash/)
+
 Documentation: [https://developers-cash.github.io/cash-pay-server-js/](https://developers-cash.github.io/cash-pay-server-js/)
 
 ## Quick Start
@@ -22,7 +38,7 @@ npm install @developers.cash/cash-pay-server-js --save
 Server-side Code for creating and marking as paid:
 
 ```javascript
-const CashPay = require('@developers-cash/cash-pay-server-js')
+const CashPay = require('@developers.cash/cash-pay-server-js')
 
 // ...
 

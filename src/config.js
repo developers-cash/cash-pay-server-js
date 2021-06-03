@@ -54,8 +54,9 @@ class Config {
      * }
      */
     this.invoice = {
-      currency: 'BCH',
+      chain: 'BCH',
       network: 'main',
+      currency: 'BCH',
       outputs: [],
       userCurrency: 'USD',
       webhook: {}
