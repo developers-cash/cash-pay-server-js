@@ -512,7 +512,7 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line130">line 130</a></code>
+                <code><a href="invoice.js.html#line131">line 131</a></code>
             </div>
             
         </h4>
@@ -593,7 +593,7 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
                 </td>
             
 
-            <td class="description last">Raw output script (in hexadecimal)</td>
+            <td class="description last">Raw output script (in ASM)</td>
         </tr>
 
     
@@ -694,8 +694,9 @@ invoice.addAddress("bitcoincash:qzeup9lysjazfvqnv07ns9c846aaul7dtuqqncf6jg", "2.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// Set OP_RETURN data to "EXAMPLE_OP_RETURN_DATA"
-invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pre>
+    <pre class="prettyprint"><code>// Set OP_RETURN data to "TEST_OP_RETURN"
+invoice.addOutput('OP_RETURN 544553545f4f505f52455455524e')
+invoice.addOutput(`OP_RETURN ${Buffer.from('TEST_OP_RETURN').toString('hex')}`)</code></pre>
 
     
 
@@ -713,7 +714,7 @@ invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')</code></pr
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line312">line 312</a></code>
+                <code><a href="invoice.js.html#line313">line 313</a></code>
             </div>
             
         </h4>
@@ -815,7 +816,7 @@ await invoice.create()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line356">line 356</a></code>
+                <code><a href="invoice.js.html#line357">line 357</a></code>
             </div>
             
         </h4>
@@ -1043,7 +1044,7 @@ await invoice.createFrom('https://api.your-site.com/request-invoice', {
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line383">line 383</a></code>
+                <code><a href="invoice.js.html#line384">line 384</a></code>
             </div>
             
         </h4>
@@ -1209,7 +1210,7 @@ await invoice.createFromExisting(res.data.invoice)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line414">line 414</a></code>
+                <code><a href="invoice.js.html#line415">line 415</a></code>
             </div>
             
         </h4>
@@ -1307,7 +1308,7 @@ invoice.destroy()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line495">line 495</a></code>
+                <code><a href="invoice.js.html#line496">line 496</a></code>
             </div>
             
         </h4>
@@ -1774,7 +1775,7 @@ let invoice = new CashPay.Invoice()
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line401">line 401</a></code>
+                <code><a href="invoice.js.html#line402">line 402</a></code>
             </div>
             
         </h4>
@@ -1871,7 +1872,7 @@ let payload = invoice.payload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line211">line 211</a></code>
+                <code><a href="invoice.js.html#line212">line 212</a></code>
             </div>
             
         </h4>
@@ -1968,7 +1969,7 @@ let payload = invoice.payload()</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line228">line 228</a></code>
+                <code><a href="invoice.js.html#line229">line 229</a></code>
             </div>
             
         </h4>
@@ -2121,7 +2122,7 @@ invoice.setData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line158">line 158</a></code>
+                <code><a href="invoice.js.html#line159">line 159</a></code>
             </div>
             
         </h4>
@@ -2266,7 +2267,7 @@ invoice.setExpires(15 * 60)</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line170">line 170</a></code>
+                <code><a href="invoice.js.html#line171">line 171</a></code>
             </div>
             
         </h4>
@@ -2411,7 +2412,7 @@ invoice.setMemo("Payment to YOUR_SERVICE_NAME")</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line182">line 182</a></code>
+                <code><a href="invoice.js.html#line183">line 183</a></code>
             </div>
             
         </h4>
@@ -2556,7 +2557,7 @@ invoice.setMemoPaid('Thank you for your payment')</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line198">line 198</a></code>
+                <code><a href="invoice.js.html#line199">line 199</a></code>
             </div>
             
         </h4>
@@ -2705,7 +2706,7 @@ invoice.setMerchantData(btoa('INVOICE_001'))</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line146">line 146</a></code>
+                <code><a href="invoice.js.html#line147">line 147</a></code>
             </div>
             
         </h4>
@@ -2850,7 +2851,7 @@ invoice.setNetwork('test')</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line250">line 250</a></code>
+                <code><a href="invoice.js.html#line251">line 251</a></code>
             </div>
             
         </h4>
@@ -3004,7 +3005,7 @@ invoice.setPrivateData({
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line266">line 266</a></code>
+                <code><a href="invoice.js.html#line267">line 267</a></code>
             </div>
             
         </h4>
@@ -3149,7 +3150,7 @@ invoice.setUserCurrency('AUD')</code></pre>
             
             <div class="container-source members">
                 <code><a href="invoice.js.html">invoice.js</a></code>,
-                <code><a href="invoice.js.html#line287">line 287</a></code>
+                <code><a href="invoice.js.html#line288">line 288</a></code>
             </div>
             
         </h4>

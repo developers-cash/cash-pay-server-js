@@ -171,11 +171,12 @@ class Invoice {
   /**
    * &lt;p>Add a script output to the Invoice.&lt;/p>
    * &lt;p>Note that this is not supported by JSONPaymentProtocol.&lt;/p>
-   * @param {string} script Raw output script (in hexadecimal)
+   * @param {string} script Raw output script (in ASM)
    * @param {number} [amount=0] Amount in satoshis
    * @example
-   * // Set OP_RETURN data to "EXAMPLE_OP_RETURN_DATA"
-   * invoice.addOutput('6a164558414d504c455f4f505f52455455524e5f44415441')
+   * // Set OP_RETURN data to "TEST_OP_RETURN"
+   * invoice.addOutput('OP_RETURN 544553545f4f505f52455455524e')
+   * invoice.addOutput(`OP_RETURN ${Buffer.from('TEST_OP_RETURN').toString('hex')}`)
    */
   addOutput (script, amount = 0) {
     this.outputs.push({
