@@ -329,7 +329,10 @@ class Invoice {
         await this._listen()
       }
 
-      this._instance.on.created.forEach(cb => cb())
+      this._instance.on.created.forEach(cb => cb({
+        event: 'created',
+        invoice: this.invoice
+      }))
 
       return this
     } catch (err) {
@@ -368,7 +371,7 @@ class Invoice {
   /**
    * <p>Instantiate the invoice from an existing invoice.</p>
    * <p>Similar to createFrom, but where you handle the AJAX request.</p>
-   * @param {Object} [params] POST parameters to send to endpoint
+   * @param {Object} [params] Invoice payload
    * @example
    * const res = axios.post('https://api.your-site.com/request-invoice', {
    *   items: ['ITEM_001', 'ITEM_002']
