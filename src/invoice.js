@@ -216,6 +216,7 @@ class Invoice {
 
   /**
    * <p>Sets (Public) Data against the invoice.</p>
+   * <p>If object is passed you must JSON.parse() when reading back.</p>
    * @param {(string|object)} data If an object is passed, this will be converted to a string.
    * @example
    * // Using a string
@@ -331,7 +332,7 @@ class Invoice {
 
       this._instance.on.created.forEach(cb => cb({
         event: 'created',
-        invoice: this.invoice
+        invoice: JSON.parse(JSON.stringify(this))
       }))
 
       return this
