@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@developers.cash/libcash-js": "latest",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "lodash": "^4.17.20",
     "qrcode": "^1.4.4",
     "socket.io": "^2.3.0"
