@@ -332,7 +332,7 @@ class Invoice {
 
       this._instance.on.created.forEach(cb => cb({
         event: 'created',
-        invoice: JSON.parse(JSON.stringify(this))
+        invoice: this
       }))
 
       return this
